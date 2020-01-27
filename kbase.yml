@@ -2,7 +2,7 @@ module-name:
     kb_escher
 
 module-description:
-    A KBase module
+    Escher vizualization for KBase
 
 service-language:
     python
