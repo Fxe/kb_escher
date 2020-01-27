@@ -3,9 +3,14 @@ A KBase module: kb_escher
 */
 
 module kb_escher {
+    typedef structure {
+        string report_name;
+        string report_ref;
+    } ReportResults;
 
-    funcdef list_maps(mapping<string,UnspecifiedObject> params) returns (mapping<string,UnspecifiedObject> output);
-    funcdef list_models(mapping<string,UnspecifiedObject> params) returns (mapping<string,UnspecifiedObject> output);
-    funcdef get_model(mapping<string,UnspecifiedObject> params) returns (mapping<string,UnspecifiedObject> output);
-    funcdef get_map(mapping<string,UnspecifiedObject> params) returns (mapping<string,UnspecifiedObject> output);
+    /*
+        This example function accepts any number of parameters and returns results in a KBaseReport
+    */
+    funcdef run_kb_escher(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
+
 };

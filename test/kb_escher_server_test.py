@@ -53,13 +53,15 @@ class kb_escherTest(unittest.TestCase):
             print('Test workspace was deleted')
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_list_models_success(self):
-        params = {}
-        ret = self.serviceImpl.list_maps(self.ctx, params)
-        print(ret)
-        
-    # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_list_maps_success(self):
-        params = {}
-        ret = self.serviceImpl.list_models(self.ctx, params)
-        print(ret)
+    def test_your_method(self):
+        # Prepare test objects in workspace if needed using
+        # self.getWsClient().save_objects({'workspace': self.getWsName(),
+        #                                  'objects': []})
+        #
+        # Run your method by
+        # ret = self.getImpl().your_method(self.getContext(), parameters...)
+        #
+        # Check returned data with
+        # self.assertEqual(ret[...], ...) or other unittest methods
+        ret = self.serviceImpl.run_kb_escher(self.ctx, {'workspace_name': self.wsName,
+                                                             'parameter_1': 'Hello World!'})
