@@ -1,0 +1,202 @@
+.escher-container input[type="radio"]{
+    position:absolute;
+    clip:rect(0, 0, 0, 0);
+    pointer-events:none;
+}
+.escher-container .hidden{display:none !important}
+.glyphicon {
+            -moz-osx-font-smoothing:grayscale;
+            -webkit-font-smoothing:antialiased;
+            display:inline-block;
+            font-style:normal;
+            font-variant:normal;
+            text-rendering:auto;
+            line-height:1;
+            font-family:"Font Awesome 5 Free";
+            font-weight:900;
+        }
+        .glyphicon-ok:before {
+            content:"\f00c"
+        }
+.glyphicon-remove:before {
+            content:"\f00d"
+        }
+      .glyphicon-plus-sign:before {
+            content:"\f067"
+        }
+        
+        .glyphicon-minus-sign:before {
+            content:"\f068"
+        }
+        
+        .glyphicon-resize-full:before {
+            content:"\f337"
+        }
+
+.glyphicon-move:before {
+            content:"\f0b2"
+        }
+.glyphicon-hand-up:before {
+            content:"\f245"
+        }
+.glyphicon-plus:before {
+            content:"\f0ad"
+        }
+.glyphicon-repeat:before {
+            content:"\f0e2"
+        }
+.glyphicon-font:before {
+            content:"\f031"
+        }
+
+.glyphicon-arrow-left:before {
+            content:"\f060"
+        }
+
+.glyphicon-arrow-right:before {
+            content:"\f061"
+        }
+
+.glyphicon-arrow-up:before {
+            content:"\f062"
+        }
+
+.glyphicon-arrow-down:before {
+            content:"\f063"
+        }
+
+.escher-container .btn .caret {
+ margin-left:0;
+}
+    .escher-container .btn-link {
+    color: 
+    #d9230f;
+    font-weight: normal;
+    border-radius: 0;
+}
+    
+    .escher-container>a {
+ color:#d9230f;
+ text-decoration:none
+}
+.escher-container>a:hover,
+.escher-container>a:focus {
+ color:#91170a;
+ text-decoration:underline
+}
+.escher-container>a:focus {
+ outline:5px auto -webkit-focus-ring-color;
+ outline-offset:-2px
+}
+    
+    .escher-container .caret {
+ display:inline-block;
+ width:0;
+ height:0;
+ margin-left:2px;
+ vertical-align:middle;
+ border-top:4px dashed;
+ border-top:4px solid \9;
+ border-right:4px solid transparent;
+ border-left:4px solid transparent
+}
+    .escher-container .btn-link, .btn-link:active, .btn-link.active, .btn-link[disabled], fieldset[disabled] .btn-link {
+    background-color: 
+    transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+    .escher-container .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+    border-color: 
+    transparent;
+}
+    .escher-container .dropdown-menu>li>a {
+ display:block;
+ padding:3px 20px;
+ clear:both;
+ font-weight:normal;
+ line-height:1.42857143;
+ color:#444444;
+ white-space:nowrap
+}
+    
+    .escher-container .dropdown-menu .divider {
+ height:1px;
+ margin:8px 0;
+ overflow:hidden;
+ background-color:#e5e5e5
+}
+    
+   .escher-container .nav-pills>li {
+ float:left;
+}
+
+.escher-container .nav-stacked>li {
+ float:none;
+}
+
+.escher-container .nav {
+ margin-bottom:0;
+ padding-left:0;
+ list-style:none;
+ display: block;
+}
+
+.escher-container .default-tooltip {
+    box-sizing: border-box;
+    min-width: 300px;
+    min-height: 100px;
+    border-radius: 2px;
+    border: 1px solid #b58787;
+    padding: 7px;
+    background-color: #fff;
+    text-align: left;
+    font-size: 16px;
+    font-family: sans-serif;
+    color: #111;
+    box-shadow: 4px 6px 20px 0px rgba(0, 0, 0, 0.4);
+}
+
+.escher-container .default-tooltip .id{
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.escher-container .default-tooltip button {
+    border-radius: 3px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    margin-top: 4px;
+    font-size: 16px;
+    padding: 3px 6px;
+}
+
+.escher-container .default-tooltip .top-right {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+
+.escher-container .default-tooltip .top-right * {
+    float: right;
+    text-align: right;
+}
+
+.escher-container .default-tooltip .top-right a {
+    font-size: 11px;
+    color: #999;
+    cursor: pointer;
+}
+.escher-container .default-tooltip .top-right a:hover {
+    color: #444;
+    text-decoration: underline;
+}
+
+.escher-container .default-tooltip .type-label {
+    font-size: 15px;
+    color: #d27066;
+    background-color: #ffeded;
+    border-radius: 2px;
+    margin: 0 0 0 10px;
+    padding: 0 5px;
+}

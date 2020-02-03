@@ -1,0 +1,31 @@
+svg.escher-svg .label-ghost {
+    font-family:sans-serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:8px;
+    fill:#e6e6e6;
+    stroke:none;
+    pointer-events: none;
+}
+
+svg.escher-svg .node-label-ghost {
+    font-size: 15px;
+}
+
+svg.escher-svg .metabolite-circle-ghost {
+    stroke: #9d9c9b;
+    fill: #d2d2d2;
+}
+
+svg.escher-svg .segment-ghost {
+    stroke: #e6e6e6;
+    stroke-width: 5px;
+    fill: none;
+}
+
+svg.escher-svg .midmarker-circle-ghost,
+svg.escher-svg .multimarker-circle-ghost {
+    fill:#fff;
+    fill-opacity:.2;
+    stroke:#323232
+}
