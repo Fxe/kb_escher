@@ -26,6 +26,9 @@ module kb_escher {
         float y;
     } EscherMapLayout2DPoint;
     
+    /*
+        @optional b1 b2
+    */
     typedef structure {
         string from_node_id;
         string to_node_id;
@@ -45,6 +48,9 @@ module kb_escher {
         list<string> genes;
     } EscherMapLayoutReaction;
     
+    /*
+        @optional bigg_id name label_x label_y node_is_primary
+    */
     typedef structure {
         string node_type;
         float x;

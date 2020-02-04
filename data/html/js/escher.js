@@ -759,6 +759,7 @@ function _get_bezier_drag (map) {
 }
 
 function _get_reaction_label_drag (map) {
+
   var move_label = function (reaction_id, displacement) {
     var reaction = map.reactions[reaction_id]
     reaction.label_x = reaction.label_x + displacement.x
@@ -1274,6 +1275,7 @@ function toggle(on_off) {
 }
 
 function show_dropdown (coords) {
+  
   // escape key
   this.clear_escape = this.map.key_manager
     .add_escape_listener(function() {
@@ -2786,6 +2788,7 @@ function _setup_modes (map, brush, zoom_container) {
  * Define keyboard shortcuts
  */
 function _get_keys (map, zoom_container, search_bar, settings_bar, enable_editing, full_screen_button) {
+
   var keys = {
     save: {
       key: 'ctrl+s',

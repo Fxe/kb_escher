@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Biochem</title>
+
+  <link rel="stylesheet" href="css/bootstrap.css" />
+  <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" />
+  <link rel="stylesheet" href="css/scroller.bootstrap4.min.css" />
+  <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css" />
+  <link rel="stylesheet" href="css/fontawesome.min.css" />
+  <link rel="stylesheet" href="css/solid.min.css" />
+  <link rel="stylesheet" href="css/regular.min.css" />
+  <link rel="stylesheet" href="css/select2.min.css" />
+  <link rel="stylesheet" href="css/builder.css" />
+  <link rel="stylesheet" href="css/builder-bootstrap.css" />
+  <link rel="stylesheet" href="css/escher-shadow.css" />
+  <link rel="stylesheet" href="css/seed.css" />
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+
+    .fill_height {
+      display: flex;
+      flex-flow: column;
+      height: 100%;
+    }
+
+    li.select2-selection__choice {
+      max-width: 100%;
+      overflow: hidden;
+      /*Altered two below to make word wrap work */
+      word-wrap: normal !important;
+      white-space: normal;
+    }
+    ul.select2-selection__rendered {
+      padding-right: 12px !important;
+    }
+    #map_container{
+      /* background-color: black; */
+      flex-grow : 1;
+      height: 100%;
+      /* height: 800px; */
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid fill_height">
+  <div id="top_bar">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Build</button>
+    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modal_report">Report</button>
+    <button id="button_merge_seed" type="button" class="btn btn-warning btn-sm">Merge with SEED</button>
+  </div>
+  <div>
+    <div id="escher_controls" class="float-left"></div>
+    <div id="select_biochem" class="float-left"></div>
+  </div>
+  <div id="map_container"></div>
+
+</div>
+
+<!-- Modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="modal_report" tabindex="-1" role="dialog" aria-labelledby="modal_report_label" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="width: 1000px">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal_report_label">Report</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h4>Compound Concensus:</h4>
+        <div id="cluster_report_container" style="max-height: 1000px; overflow: scroll"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal_builder" tabindex="-1" role="dialog" aria-labelledby="modal_builder_label" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="max-width: 1500px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal_builder_label">Build Configuration</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <div class="form-row">
+                <div class="form-group col-md-12" style="width: 100%">
+                <label for="select_target_map">Target Map Layout</label>
+                  <div class="select2-seed"><div id="select_target_map"></div></div>
+
+                </div>
+              </div>
+              <label for="select_target_cmp">Target Standard Compartment</label>
+              <div id="select_target_cmp"></div>
+
+              <label for="select_model">SBML Model</label>
+              <div id="select_model"></div>
+
+              <label for="select_model_cmp">SBML Compartment</label>
+              <div id="select_model_cmp"></div>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="select_build_list">Build Selection:</label>
+              <select id="select_build_list" class="form-control" size="4" multiple="multiple" style="width:100%;height : 200px">
+              </select>
+
+              <label >Grid</label>
+              <label for="input_grid_x">X:</label>
+              <input id="input_grid_x" class="form-control" type="number" min="0" max="10" value="3">
+              <label for="input_grid_y">Y:</label>
+              <input id="input_grid_y" class="form-control" type="number" min="0" max="10" value="2">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <button id="button_add_map_option" class="btn btn-primary">Add</button>
+            </div>
+            <div class="form-group col-md-6">
+              <button id="button_remove_select" class="btn btn-primary">Remove</button>
+
+              <button id="button_build_map" class="btn btn-primary">Build</button>
+
+              <button id="button_merge_map" class="btn btn-success">Merge</button>
+            </div>
+          </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+
+<script src="js/d3-3.5.6.min.js"></script>
+<script src="js/escher.js"></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/underscore-1.9.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/select2.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.dataTables.min.js"></script>
+<script src="js/dataTables.bootstrap4.min.js"></script>
+<script src="js/dataTables.scroller.min.js"></script>
+<script src="js/dropzone.js"></script>
+<script src="js/mock_data.js"></script>
+<script src="js/widget_escher_modelseed.js"></script>
+<script src="js/widget_system_status.js"></script>
+<script src="js/escher_shadow.js"></script>
+<script src="js/curation_env.js"></script>
+<script src="js/curation_api.js"></script>
+<script src="js/merge_report.js"></script>
+<script src="js/model_biochem.js"></script>
+<script>
+  var cmp_target_options = [
+    {
+      id: 'c',
+      text: 'Cytosol (c)'
+    },
+    {
+      id: 'm',
+      text: 'Mitochondria (m)'
+    },
+    {
+      id: 'e',
+      text: 'Extracellular (e)'
+    },
+    {
+      id: 'v',
+      text: 'Vacuole (v)'
+    },
+    {
+      id: 'n',
+      text: 'Nucleus (n)'
+    },
+    {
+      id: 'x',
+      text: 'Peroxisome (x)'
+    },
+    {
+      id: 'p',
+      text: 'Periplasm (p)'
+    },{
+      id: 'g',
+      text: 'Golgi (g)'
+    },
+    {
+      id: 'r',
+      text: 'Endoplasmic Reticulum (r)'
+    },
+    {
+      id: 'h',
+      text: 'Chloroplast (h)'
+    },
+    {
+      id: 'f',
+      text: 'Thylakoid Lumen (f)'
+    }
+  ];
+</script>
+</html>

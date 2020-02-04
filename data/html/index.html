@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KBase Escher Viewer</title>
+
+  <link rel="stylesheet" href="css/bootstrap.css" />
+  <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" />
+  <link rel="stylesheet" href="css/scroller.bootstrap4.min.css" />
+  <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css" />
+  <link rel="stylesheet" href="css/fontawesome.min.css" />
+  <link rel="stylesheet" href="css/solid.min.css" />
+  <link rel="stylesheet" href="css/regular.min.css" />
+  <link rel="stylesheet" href="css/select2.min.css" />
+  <link rel="stylesheet" href="css/builder.css" />
+  <link rel="stylesheet" href="css/builder-bootstrap.css" />
+  <link rel="stylesheet" href="css/escher-shadow.css" />
+  <link rel="stylesheet" href="css/seed.css" />
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+
+    table.dataTable tbody tr.selected {
+      background-color: #B0BED9;
+    }
+
+    .fill_height {
+      display: flex;
+      flex-flow: column;
+      height: 100%;
+    }
+
+    li.select2-selection__choice {
+      max-width: 100%;
+      overflow: hidden;
+      /*Altered two below to make word wrap work */
+      word-wrap: normal !important;
+      white-space: normal;
+    }
+    ul.select2-selection__rendered {
+      padding-right: 12px !important;
+    }
+    #map_container{
+      /* background-color: black; */
+      flex-grow : 1;
+      height: 100%;
+      /* height: 800px; */
+    }
+  </style>
+<body>
+<div class="container-fluid fill_height">
+  <div id="top_bar">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Setup Pathway Viewer</button>
+  </div>
+  <div>
+    <div id="escher_controls" class="float-left"></div>
+    <div id="select_biochem" class="float-left"></div>
+  </div>
+  <div>
+    <table id="table_map_select" class="table table-striped">
+      <thead class="thead-light">
+      <tr>
+        <th scope="col">Map</th>
+        <th scope="col">Compounds</th>
+        <th scope="col">Reactions</th>
+      </tr>
+      </thead>
+    </table>
+  </div>
+  <!--
+  <div id="map_container"></div>
+  -->
+  <div class="modal fade" id="modal_builder" tabindex="-1" role="dialog" aria-labelledby="modal_builder_label" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 1500px">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal_builder_label">Build Configuration</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <div class="form-row">
+                <div class="form-group col-md-12" style="width: 100%">
+                  <label for="select_target_map">Target Map Layout</label>
+                  <div class="select2-seed"><div id="select_target_map"></div></div>
+
+                </div>
+              </div>
+              <label for="select_target_cmp">Target Standard Compartment</label>
+              <div id="select_target_cmp"></div>
+
+              <label for="select_model">SBML Model</label>
+              <div id="select_model"></div>
+
+              <label for="select_model_cmp">SBML Compartment</label>
+              <div id="select_model_cmp"></div>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="select_build_list">Build Selection:</label>
+              <select id="select_build_list" class="form-control" size="4" multiple="multiple" style="width:100%;height : 200px">
+              </select>
+
+              <label >Grid</label>
+              <label for="input_grid_x">X:</label>
+              <input id="input_grid_x" class="form-control" type="number" min="0" max="10" value="3">
+              <label for="input_grid_y">Y:</label>
+              <input id="input_grid_y" class="form-control" type="number" min="0" max="10" value="2">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <button id="button_add_map_option" class="btn btn-primary">Add</button>
+            </div>
+            <div class="form-group col-md-6">
+              <button id="button_remove_select" class="btn btn-primary">Remove</button>
+
+              <button id="button_build_map" class="btn btn-primary">Build</button>
+
+              <button id="button_merge_map" class="btn btn-success">Merge</button>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+<script src="js/d3-3.5.6.min.js"></script>
+<script src="js/escher.js"></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/underscore-1.9.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+<script src="js/dataTables.bootstrap4.min.js"></script>
+<script>
+  //
+
+
+  $.getJSON("data/map_list.json", function(e) {
+    //console.log(e);
+    let table = $("#table_map_select").DataTable({
+      select: {
+        style: 'single'
+      }
+    });
+    let rows = [];
+    _.each(e, function (map_data, map_id) {
+      let total_cpd_in_map = 0;
+      let total_rxn_in_map = 0;
+      let in_map_cpd = [];
+      let in_map_rxn = [];
+      _.each(map_data, function (stats, model_id) {
+        total_cpd_in_map = stats['map_cpd'];
+        total_rxn_in_map = stats['map_rxn'];
+        in_map_cpd.push(stats['cpd_in_map_count']);
+        in_map_rxn.push(stats['rxn_in_map_count']);
+      });
+      let row_data = [
+        map_id,
+        total_cpd_in_map + ' (' + in_map_cpd + ')',
+        total_rxn_in_map + ' (' + in_map_rxn + ')'
+      ];
+      rows.push(row_data)
+    });
+    table.rows.add(rows).draw();
+  });
+
+  /*
+
+    _.each(catalog, function(map_list, dataset_id) {
+    _.each(map_list, function(map_id) {
+      //button_html = $('a', {'href' : '#'}).html('<span class="oi oi-eye"></span>')
+      button_html = '<a href="#" onclick="load_escher_map(\'' + dataset_id +'\', \'' + map_id + '\');"><span class="oi oi-eye"></span></a>'
+
+      let map_str = map_id
+      if (map_id.indexOf(dataset_id) == 0) {
+        map_str = map_id.substring(dataset_id.length + 1)
+      }
+      row_data = [
+        dataset_id,
+        map_str,
+        '-',
+        '-',
+        button_html
+      ];
+      rows.push(row_data)
+    });
+  });
+
+    for (map_id in e_catalog) {
+      map_data = e_catalog[map_id]
+      button_html = '<a href="#" onclick="load_escher_map(\'' + map_data["src"] +'\');"><span class="oi oi-eye"></span></a>'
+      row_data = [
+        map_id,
+        '-',
+        '-',
+        '-',
+        button_html
+      ];
+      //rows.push(row_data)
+    }*/
+
+
+</script>
+</html>
+
