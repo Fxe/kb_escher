@@ -49,6 +49,10 @@ parameters :
         ui-name : Y
         short-hint : Y
         long-hint  : Y
+    report_height :
+        ui-name : report_height
+        short-hint : report_height
+        long-hint  : report_height
 parameter-groups:
     model_objects :
         ui-name : model_objects

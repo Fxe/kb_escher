@@ -4,6 +4,7 @@ import logging
 import os
 import json
 import uuid
+import shutil
 
 from kb_escher.utils import mkdir_p
 
@@ -86,6 +87,7 @@ class kb_escher:
         # ctx is the context object
         # return variables are: output
         #BEGIN run_kb_escher_pathway
+        ws = params['workspace_name']
         print(params)
         
         output_directory = os.path.join(self.shared_folder, str(uuid.uuid4()))
@@ -108,6 +110,25 @@ class kb_escher:
             'label': 'viewer',
             'description': 'description'
         })
+        
+        report = KBaseReport(self.callback_url)
+        
+        report_params = {
+            'message': 'message_in_app ' + output_directory,
+            'warnings': ['warnings_in_app'],
+            'workspace_name': ws,
+            'objects_created': [],
+            'html_links': html_report,
+            'direct_html_link_index': 0,
+            'html_window_height': 800,
+        }
+        
+        report_info = report.create_extended_report(report_params)
+        
+        output = {
+            'report_name': report_info['name'], 
+            'report_ref': report_info['ref']
+        }
         
         #END run_kb_escher_pathway
 

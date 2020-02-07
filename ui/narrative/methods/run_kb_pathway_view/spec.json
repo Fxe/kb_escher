@@ -51,11 +51,24 @@
         "valid_ws_types": []
       }
     },
+{
+      "id": "report_height",
+      "optional": false,
+      "advanced": true,
+      "allow_multiple": false,
+      "default_values": [
+        800
+      ],
+      "field_type": "text",
+      "text_options": {
+        "valid_ws_types": []
+      }
+    },
     {
       "id": "grid_x",
       "optional": false,
       "advanced": false,
-      "allow_multiple": true,
+      "allow_multiple": false,
       "default_values": [
         1
       ],
@@ -68,7 +81,7 @@
       "id": "grid_y",
       "optional": false,
       "advanced": false,
-      "allow_multiple": true,
+      "allow_multiple": false,
       "default_values": [
         1
       ],
@@ -136,6 +149,9 @@
                 },{
                     "input_parameter": "map_ids",
                     "target_property": "map_ids"
+                },{
+                    "input_parameter": "report_height",
+                    "target_property": "report_height"
                 }
             ],
             "output_mapping": [
