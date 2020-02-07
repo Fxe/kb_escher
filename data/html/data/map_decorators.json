@@ -1,1 +1,1 @@
-{"iML1515": {"FBA": ["model1_flux_glucose.json"]}, "KBase": {"FBA": ["model2_flux_glucose.json"]}}
+{"iML1515": {"reaction": {"FBA": [{"id": "Glucose", "path": "model1_flux_glucose.json"}, {"id": "Etho", "path": "model1_flux_etho.json"}, {"id": "Ac", "path": "model1_flux_ac.json"}]}}, "KBase": {"reaction": {"FBA": [{"id": "Glucose", "path": "model2_flux_glucose.json"}]}}}

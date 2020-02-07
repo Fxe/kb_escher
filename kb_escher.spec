@@ -96,5 +96,7 @@ module kb_escher {
         This example function accepts any number of parameters and returns results in a KBaseReport
     */
     funcdef run_kb_escher(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
+    
+    funcdef run_kb_escher_pathway(mapping<string,UnspecifiedObject> params) returns (ReportResults output) authentication required;
 
 };

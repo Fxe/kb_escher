@@ -60,20 +60,26 @@
     <div id="escher_controls" class="float-left"></div>
     <div id="select_biochem" class="float-left"></div>
   </div>
-  <div>
-    <table id="table_map_select" class="table table-striped">
-      <thead class="thead-light">
-      <tr>
-        <th scope="col">Map</th>
-        <th scope="col">Compounds</th>
-        <th scope="col">Reactions</th>
-      </tr>
-      </thead>
-    </table>
+  <div class="row">
+    <div class="col-md-6">
+      <table id="table_map_select" class="table table-striped">
+        <thead class="thead-light">
+        <tr>
+          <th scope="col">Map</th>
+          <th scope="col">Compounds</th>
+          <th scope="col">Reactions</th>
+        </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <div id="controls"></div>
+    </div>
+
   </div>
-  <!--
+
   <div id="map_container"></div>
-  -->
+
   <div class="modal fade" id="modal_builder" tabindex="-1" role="dialog" aria-labelledby="modal_builder_label" aria-hidden="true">
     <div class="modal-dialog" role="document" style="max-width: 1500px">
       <div class="modal-content">
@@ -143,14 +149,75 @@
 <script src="js/escher.js"></script>
 <script src="js/jquery-3.4.1.min.js"></script>
 <script src="js/underscore-1.9.1.min.js"></script>
+<script src="js/popper.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
 <script src="js/dataTables.bootstrap4.min.js"></script>
+<script src="js/curation_api.js"></script>
+<script src="js/escher_map.js"></script>
 <script>
   //
 
+  let current_flux_data = {};
+  let models = ['iML1515', 'KBase'];
 
+  const clear_flux_model = function(model_id) {
+    _.each(_.keys(current_flux_data), function(k) {
+      let data = k.split('@');
+      if (data[data.length - 1] === model_id) {
+        current_flux_data[k] = 0.0;
+      }
+    });
+  };
+
+  const update_flux_data = function() {
+    e_builder.set_reaction_data(current_flux_data);
+    //e_builder.map.apply_reaction_data_to_map(current_flux_data);
+    //e_builder.map.draw_everything();
+  };
+
+  //const api = new CurationAPI();
+$.getJSON("data/map_decorators.json", function(o) {
+    console.log(o);
+    let container = $('#controls');
+    //<input type="radio" name="iML1515_FBA" value="none"> None<br>
+    _.each(o, function(decorators, model_id) {
+        console.log(model_id, decorators);
+        container.append(model_id);
+        container.append('<br>');
+        _.each(decorators, function(d_type_objects, d_supertype) {
+            
+        _.each(d_type_objects, function(d_objects, d_type) {
+            let clear_input = $('<input>', {type : 'radio', name : model_id, value : 'none'});
+            clear_input.click(function() {
+              clear_flux_model(model_id);
+              update_flux_data();
+            });
+            container.append(clear_input);
+            container.append('None <br>');
+            _.each(d_objects, function(d_object) {
+              let change_flux_input = $('<input>', {type : 'radio', name : model_id, value : d_object.path});
+              change_flux_input.click(function() {
+                $.getJSON("data/" + d_object.path, function(o) {
+                  _.each(o, function(v, k) {
+                    current_flux_data[k + '@' + model_id] = [v];
+                  });
+                  //_.extend(current_flux_data, o);
+                  update_flux_data();
+                });
+                //alert('clear ' + d_object.path);
+
+              });
+               container.append(change_flux_input);
+              container.append(d_object.id + ' <br>')
+            })
+        })
+        });
+
+    })
+});
+    
   $.getJSON("data/map_list.json", function(e) {
     //console.log(e);
     let table = $("#table_map_select").DataTable({
@@ -177,7 +244,27 @@
       ];
       rows.push(row_data)
     });
-    table.rows.add(rows).draw();
+    //table.rows.add(rows).draw();
+  });
+
+  let build_config = {
+    maps : [],
+    x : 2,
+    y : 2
+  };
+
+  let current_map = null;
+  $.getJSON("data/iML1515.json", function(e_model) {
+    $.getJSON("data/escher_map.json", function(e_map) {
+      current_map = e_map;
+      let e_options = {
+        //menu: 'zoom',
+        fill_screen: false
+        //tooltip_component: tooltip,
+      };
+      //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
+      e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
+    });
   });
 
   /*

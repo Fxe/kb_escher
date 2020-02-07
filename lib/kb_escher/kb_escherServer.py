@@ -342,6 +342,10 @@ class Application(object):
                              name='kb_escher.run_kb_escher',
                              types=[dict])
         self.method_authentication['kb_escher.run_kb_escher'] = 'required'  # noqa
+        self.rpc_service.add(impl_kb_escher.run_kb_escher_pathway,
+                             name='kb_escher.run_kb_escher_pathway',
+                             types=[dict])
+        self.method_authentication['kb_escher.run_kb_escher_pathway'] = 'required'  # noqa
         self.rpc_service.add(impl_kb_escher.status,
                              name='kb_escher.status',
                              types=[dict])
