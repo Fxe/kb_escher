@@ -2,8 +2,14 @@
 #BEGIN_HEADER
 import logging
 import os
+import json
+import uuid
+
+from kb_escher.utils import mkdir_p
 
 from installed_clients.KBaseReportClient import KBaseReport
+from installed_clients.DataFileUtilClient import DataFileUtil
+from installed_clients.WorkspaceClient import Workspace
 #END_HEADER
 
 
@@ -35,6 +41,9 @@ class kb_escher:
         #BEGIN_CONSTRUCTOR
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.shared_folder = config['scratch']
+        
+        self.dfu = DataFileUtil(self.callback_url)
+        
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
         #END_CONSTRUCTOR
@@ -78,6 +87,28 @@ class kb_escher:
         # return variables are: output
         #BEGIN run_kb_escher_pathway
         print(params)
+        
+        output_directory = os.path.join(self.shared_folder, str(uuid.uuid4()))
+        mkdir_p(output_directory)
+        
+        print('output_directory', output_directory, os.listdir(output_directory))
+        shutil.copytree('/kb/module/data/html', output_directory + '/report')
+        
+        print(output_directory)
+        
+        shock_id = self.dfu.file_to_shock({
+            'file_path': output_directory + '/report',
+            'pack': 'zip'
+        })['shock_id']
+        
+        html_report = []
+        html_report.append({
+            'shock_id': shock_id,
+            'name': 'index.html',
+            'label': 'viewer',
+            'description': 'description'
+        })
+        
         #END run_kb_escher_pathway
 
         # At some point might do deeper type checking...
