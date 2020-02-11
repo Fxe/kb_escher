@@ -8,6 +8,17 @@ MAINTAINER KBase Developer
 
 # RUN apt-get update
 
+#RUN mkdir -p /opt/data
+#RUN git clone https://github.com/ModelSEED/ModelSEEDDatabase.git /opt/data/ModelSEEDDatabase
+
+RUN mkdir -p /opt/build
+RUN git clone https://github.com/ModelSEED/modelseed-escher.git /opt/build/modelseed-escher
+
+RUN pip install --upgrade pip
+
+RUN pip install cobra
+RUN pip install cobrakbase
+RUN pip install /opt/build/modelseed-escher
 
 # -----------------------------------------
 

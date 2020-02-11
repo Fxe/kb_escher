@@ -28,10 +28,22 @@ parameters :
         ui-name : Model ID
         short-hint : FBAModel
         long-hint  : FBAModel
+    map_id:
+        ui-name : map_id
+        short-hint : kbase_compartment_id_hint
+        long-hint  : kbase_compartment_id_lhint
+    user_map_id:
+        ui-name : user_map_id
+        short-hint : kbase_compartment_id_hint
+        long-hint  : kbase_compartment_id_lhint
     model_id :
         ui-name : model_id
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
+    model_compartment_id :
+        ui-name : model_compartment_id
+        short-hint : model_compartment_id_hint
+        long-hint  : model_compartment_id_lhint
     object_ids :
         ui-name : object_ids
         short-hint : model_compartment_id_hint
