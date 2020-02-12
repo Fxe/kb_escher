@@ -23,9 +23,10 @@ RUN pip install /opt/build/modelseed-escher
 RUN pip install networkx
 # -----------------------------------------
 
+RUN mkdir -p /root/.cache/escher/1-0-0/5/maps/ModelSEED
+COPY maps/ModelSEED /root/.cache/escher/1-0-0/5/maps/ModelSEED
+
 COPY ./ /kb/module
-RUN mkdir -p /root/.cache/escher/1-0-0/5/maps
-COPY maps/ModelSEED /root/.cache/escher/1-0-0/5/maps
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 
