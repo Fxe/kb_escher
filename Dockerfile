@@ -16,10 +16,11 @@ RUN git clone https://github.com/ModelSEED/modelseed-escher.git /opt/build/model
 
 RUN pip install --upgrade pip
 
+
 RUN pip install cobra
 RUN pip install cobrakbase
 RUN pip install /opt/build/modelseed-escher
-
+RUN pip install networkx
 # -----------------------------------------
 
 COPY ./ /kb/module
