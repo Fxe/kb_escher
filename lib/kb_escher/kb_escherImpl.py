@@ -15,7 +15,7 @@ from cobrakbase.core import KBaseFBAModel
 from modelseed_escher.core import EscherMap
 
 from kb_escher.utils import mkdir_p
-
+from kb_escher.kb_escher_utils import adapt_map_to_model
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace
