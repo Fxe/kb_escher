@@ -121,6 +121,17 @@ class kb_escher:
             em = adapt_map_to_model(em, cmp_id, alias, fbamodel)
             return em
         
+        em_list = []
+        for grid_cell in params['grid_maps']:
+            em = build_grid_cell(grid_cell, escher_seed, api)
+            em_list.append(em)
+        
+        grid = modelseed_escher.EscherGrid()
+        grid_map = grid.build(em_list, grid_size)
+        
+        with open('/kb/module/data/html/data/escher_map.json', 'w') as fh:
+            fh.write(json.dumps(grid_map.escher_map))
+        
         output_directory = os.path.join(self.shared_folder, str(uuid.uuid4()))
         mkdir_p(output_directory)
         
