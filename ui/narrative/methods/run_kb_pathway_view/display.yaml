@@ -24,8 +24,8 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    model_ids :
-        ui-name : Model ID
+    column_size :
+        ui-name : column_size
         short-hint : FBAModel
         long-hint  : FBAModel
     map_id:
@@ -40,34 +40,17 @@ parameters :
         ui-name : model_id
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
-    model_compartment_id :
-        ui-name : model_compartment_id
-        short-hint : model_compartment_id_hint
-        long-hint  : model_compartment_id_lhint
     object_ids :
         ui-name : object_ids
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
-
-    map_ids :
-        ui-name : maps
-        short-hint : X
-        long-hint  : X
-    grid_x :
-        ui-name : X
-        short-hint : X
-        long-hint  : X
-    grid_y :
-        ui-name : Y
-        short-hint : Y
-        long-hint  : Y
     report_height :
         ui-name : report_height
         short-hint : report_height
         long-hint  : report_height
 parameter-groups:
-    model_objects :
-        ui-name : model_objects
+    grid_maps :
+        ui-name : grid_maps
         short-hint : Use this control to explicitly specify how model compartments correspond to compartments in KBase
         long-hint  : Use this control to explicitly specify how model compartments correspond to compartments in KBase
 description : |

@@ -11,43 +11,27 @@
     },
    "parameter-groups": [
       {
-        "id": "model_objects",
+        "id": "grid_maps",
         "parameters": [
           "map_id",
           "user_map_id",
           "model_id",
-          "model_compartment_id",
           "object_ids"
         ],
-        "optional": true,
+        "optional": false,
         "advanced": false,
         "allow_multiple": true,
         "with_border": true
       }
     ],
     "parameters": [ 
-    {
-      "id": "model_ids",
+{
+      "id": "column_size",
       "optional": false,
       "advanced": false,
-      "allow_multiple": true,
+      "allow_multiple": false,
       "default_values": [
-        ""
-      ],
-      "field_type": "text",
-      "text_options": {
-        "valid_ws_types": [
-          "KBaseFBA.FBAModel"
-        ]
-      }
-    },
-    {
-      "id": "map_ids",
-      "optional": false,
-      "advanced": false,
-      "allow_multiple": true,
-      "default_values": [
-        ""
+        1
       ],
       "field_type": "text",
       "text_options": {
@@ -67,32 +51,6 @@
         "valid_ws_types": []
       }
     },
-    {
-      "id": "grid_x",
-      "optional": false,
-      "advanced": false,
-      "allow_multiple": false,
-      "default_values": [
-        1
-      ],
-      "field_type": "text",
-      "text_options": {
-        "valid_ws_types": []
-      }
-    },
-        {
-      "id": "grid_y",
-      "optional": false,
-      "advanced": false,
-      "allow_multiple": false,
-      "default_values": [
-        1
-      ],
-      "field_type": "text",
-      "text_options": {
-        "valid_ws_types": []
-      }
-        },
 
     {
       "id": "object_ids",
@@ -477,39 +435,6 @@
       "text_options": {"valid_ws_types": ["KBaseFBA.EscherMap"]}
     },
     {
-      "allow_multiple": false,
-      "optional": false,
-      "field_type": "textsubdata",
-      "id": "model_compartment_id",
-      "advanced": false,
-      "default_values": [
-        ""
-      ],
-      "text_options": {
-        "valid_ws_types": []
-      },
-      "textsubdata_options": {
-        "allow_custom": false,
-        "show_src_obj": false,
-        "subdata_selection": {
-          "parameter_id": "model_id",
-          "path_to_subdata": [
-            "modelcompartments"
-          ],
-          "selection_id": "id",
-          "selection_description": [
-            "label"
-          ],
-          "subdata_included": [
-            "modelcompartments/[*]/id",
-            "modelcompartments/[*]/label"
-          ],
-          "description_template": "- {{label}}"
-        },
-        "multiselection": false
-      }
-    },
-    {
       "id": "model_id",
       "optional": false,
       "advanced": false,
@@ -538,20 +463,11 @@
                     "narrative_system_variable": "workspace_id",
                     "target_property": "workspace_id"
                 },{
-                    "input_parameter": "model_ids",
-                    "target_property": "model_ids"
+                    "input_parameter": "column_size",
+                    "target_property": "column_size"
                 },{
-                    "input_parameter": "grid_x",
-                    "target_property": "grid_x"
-                },{
-                    "input_parameter": "grid_y",
-                    "target_property": "grid_y"
-                },{
-                    "input_parameter": "model_objects",
-                    "target_property": "model_objects"
-                },{
-                    "input_parameter": "map_ids",
-                    "target_property": "map_ids"
+                    "input_parameter": "grid_maps",
+                    "target_property": "grid_maps"
                 },{
                     "input_parameter": "report_height",
                     "target_property": "report_height"
