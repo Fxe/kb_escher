@@ -163,7 +163,7 @@ def setup_viewer_data(params, api, data_path):
         ref = api.get_object_info_from_ref(model_ref)
         model_raw = api.get_object(ref.id, ref.workspace_id)
         fbamodel = cobrakbase.core.KBaseFBAModel(model_raw)
-        models[] = fbamodel
+        models[model_ref] = fbamodel
         b = cobrakbase.core.converters.KBaseFBAModelToCobraBuilder(fbamodel)
         cobra_model = b.build()
         

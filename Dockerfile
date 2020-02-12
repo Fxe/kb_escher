@@ -28,6 +28,8 @@ RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
 
+RUN python /kb/module/scripts/list_maps.py
+
 RUN make all
 
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]

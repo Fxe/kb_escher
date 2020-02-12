@@ -6,6 +6,13 @@ import json
 import uuid
 import shutil
 
+import escher
+import cobra
+import cobrakbase
+import modelseed_escher
+from cobrakbase.core import KBaseFBAModel
+from modelseed_escher.core import EscherMap
+
 from kb_escher.utils import mkdir_p
 
 from installed_clients.KBaseReportClient import KBaseReport
@@ -42,7 +49,7 @@ class kb_escher:
         #BEGIN_CONSTRUCTOR
         self.callback_url = os.environ['SDK_CALLBACK_URL']
         self.shared_folder = config['scratch']
-        
+        self.ws_url = config['workspace-url']
         self.dfu = DataFileUtil(self.callback_url)
         
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
@@ -89,6 +96,30 @@ class kb_escher:
         #BEGIN run_kb_escher_pathway
         ws = params['workspace_name']
         print(params)
+        api = cobrakbase.KBaseAPI(ctx['token'], config={'workspace-url' : self.ws_url})
+        escher_seed = modelseed_escher.EscherManager(escher)
+        
+        column_size = int(params['column_size'])
+        grid_cells = len(params['grid_maps'])
+        grid_size = (column_size, math.ceil(grid_cells / column_size))
+        
+        def build_grid_cell(grid_cell, escher_seed, api):
+            em = None
+            if not grid_cell['map_id'] == 'custom':
+                em = escher_seed.get_map('ModelSEED', 'ModelSEED', grid_cell['map_id'])
+            else:
+                ref = api.get_object_info_from_ref(grid_cell['user_map_id'])
+                map_data = api.get_object(ref.id, ref.workspace_id)
+                em = modelseed_escher.core.EscherMap([map_data['metadata'], map_data['layout']])
+
+            cmp_id = 'c0' #should come from parameters
+            ref = api.get_object_info_from_ref(grid_cell['model_id'])
+            fbamodel = KBaseFBAModel(api.get_object(ref.id, ref.workspace_id))
+            alias = None
+            if alias == None:
+                alias = ref.id
+            em = adapt_map_to_model(em, cmp_id, alias, fbamodel)
+            return em
         
         output_directory = os.path.join(self.shared_folder, str(uuid.uuid4()))
         mkdir_p(output_directory)
