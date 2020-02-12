@@ -163,7 +163,7 @@ class kb_escher:
             'objects_created': [],
             'html_links': html_report,
             'direct_html_link_index': 0,
-            'html_window_height': 800,
+            'html_window_height': int(params['report_height']),
         }
         
         report_info = report.create_extended_report(report_params)

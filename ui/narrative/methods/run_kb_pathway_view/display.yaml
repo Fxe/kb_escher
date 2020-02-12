@@ -1,7 +1,7 @@
 #
 # define display information
 #
-name: (TEST) Escher FBAModel Single pathway
+name: Escher Pathway Viewer
 
 tooltip: |
     Perform some kind of method
@@ -38,6 +38,10 @@ parameters :
         long-hint  : kbase_compartment_id_lhint
     model_id :
         ui-name : model_id
+        short-hint : kbase_compartment_id_hint
+        long-hint  : kbase_compartment_id_lhint
+    model_alias :
+        ui-name : model_alias
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
     object_ids :

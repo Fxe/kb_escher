@@ -16,6 +16,7 @@
           "map_id",
           "user_map_id",
           "model_id",
+          "model_alias",
           "object_ids"
         ],
         "optional": false,
@@ -448,7 +449,20 @@
           "KBaseFBA.FBAModel"
         ]
       }
-    }
+    },
+      {
+      "id": "model_alias",
+      "optional": true,
+      "advanced": false,
+      "allow_multiple": false,
+      "default_values": [
+        1
+      ],
+      "field_type": "text",
+      "text_options": {
+        "valid_ws_types": []
+      }
+    }  
   ],
     "behavior": {
         "service-mapping": {
