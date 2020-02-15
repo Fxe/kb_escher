@@ -155,6 +155,7 @@
 <script src="js/dataTables.bootstrap4.min.js"></script>
 <script src="js/curation_api.js"></script>
 <script src="js/escher_map.js"></script>
+<script src="js/escher_shadow.js"></script>
 <script>
   //
 
@@ -335,13 +336,17 @@ $.getJSON("data/map_decorators.json", function(o) {
   });
 
   let build_config = {
-    maps : [],
-    x : 2,
+    maps : [
+      'model;c;c;base_map.json',
+      'model;c;c;base_map.json',
+      'model;c;c;base_map.json'
+    ],
+    x : 3,
     y : 2
   };
 
   let current_map = null;
-  $.getJSON("data/models/model3.json", function(e_model) {
+  $.getJSON("data/models/iML1515.json", function(e_model) {
     $.getJSON("data/escher_map.json", function(e_map) {
       current_map = e_map;
       let e_options = {
@@ -351,6 +356,10 @@ $.getJSON("data/map_decorators.json", function(o) {
       };
       //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
       e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
+
+      let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
+      console.log(shadow_grid_layout);
+      draw_show_grid_layout2(shadow_grid_layout, $);
     });
   });
 

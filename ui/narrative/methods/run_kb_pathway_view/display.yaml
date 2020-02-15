@@ -48,6 +48,22 @@ parameters :
         ui-name : object_ids
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
+    cpd_abundance :
+        ui-name : cpd_abundance
+        short-hint : model_compartment_id_hint
+        long-hint  : model_compartment_id_lhint
+    cpd_abundance_dataset :
+        ui-name : cpd_abundance_dataset
+        short-hint : model_compartment_id_hint
+        long-hint  : model_compartment_id_lhint
+    gene_expression :
+        ui-name : gene_expression
+        short-hint : model_compartment_id_hint
+        long-hint  : model_compartment_id_lhint
+    gene_expression_dataset :
+        ui-name : gene_expression_dataset
+        short-hint : model_compartment_id_hint
+        long-hint  : model_compartment_id_lhint        
     report_height :
         ui-name : report_height
         short-hint : report_height

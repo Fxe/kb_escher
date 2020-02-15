@@ -1,3 +1,26 @@
+const get_shadow_grid_layout = function(canvas, config) {
+  let shadow_grid_layout = {};
+  let w = canvas.width / config.x;
+  let h = canvas.height / config.y;
+
+  let index = 0;
+  for (let xx = 0; xx < config.y; xx++) {
+    for (let yy = 0; yy < config.x; yy++) {
+      if (config.maps[index]) {
+        let map_config = config.maps[index].split(';')
+        let map_id = map_config[3];
+        if (!shadow_grid_layout[map_id]) {
+          shadow_grid_layout[map_id] = [];
+        }
+        shadow_grid_layout[map_id].push([yy, xx, w, h, map_config[2]]);
+      }
+      index++;
+    }
+  }
+
+  return shadow_grid_layout
+};
+
 const draw_show_grid_layout = function(shadow_grid_layout, api) {
   if (_.size(shadow_grid_layout) > 0) {
     let map_id = _.keys(shadow_grid_layout).pop();
@@ -25,13 +48,52 @@ const draw_show_grid_layout = function(shadow_grid_layout, api) {
   }
 };
 
+const draw_show_grid_layout2 = function(shadow_grid_layout, jquery) {
+  if (_.size(shadow_grid_layout) > 0) {
+    let map_id = _.keys(shadow_grid_layout).pop();
+    jquery.getJSON('data/map_model/' +  map_id, function(map_data) {
+      _.each(shadow_grid_layout[map_id], function(draw_coordinates) {
+        let xx = draw_coordinates[0];
+        let yy = draw_coordinates[1];
+        let w = draw_coordinates[2];
+        let h = draw_coordinates[3];
+        let x_offset = (xx * w) + -1 * map_data[1].canvas.x;
+        let y_offset = (yy * h) + -1 * map_data[1].canvas.y;
+        draw_shadow_map(map_data, x_offset, y_offset);
+      });
+      //let draw_coordinates = shadow_grid_layout[map_id];
+      //console.log(map_id, draw_coordinates);
+
+      //console.log(map_id, (xx * w), (yy * h));
+      //console.log(map_id, map_data[1].canvas.x, map_data[1].canvas.y);
+
+      //console.log(map_id, x_offset, y_offset);
+
+      delete shadow_grid_layout[map_id];
+      draw_show_grid_layout(shadow_grid_layout, jquery);
+    });
+  }
+};
+
 const draw_shadow_map = function(map, x_offset = 0, y_offset = 0) {
   if (d3.select('#ghost').empty()) {
     d3.select('.escher-svg').select('g').append('g').attr('id', 'ghost');
 
   }
+
+
   //d3.select('#ghost')
   let g = d3.select('#ghost').append('g').attr('class', 'node');
+
+  g.append('text')
+    .attr('class', 'node-label-ghost label-ghost')
+    .attr('visibility', 'visible')
+    .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 40) + ')').text('WAAAAAAAAAAAAAAA');
+  g.append('text')
+    .attr('class', 'node-label-ghost label-ghost')
+    .attr('visibility', 'visible')
+    .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 80) + ')').text('WAAAAAAAAAAAAAAA');
+
   _.each(map[1].reactions, function(n, uid) {
     let label_x = n.label_x + x_offset;
     let label_y = n.label_y + y_offset;
