@@ -17,7 +17,7 @@ from jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError, \
 from jsonrpcbase import ServerError as JSONServerError
 
 from biokbase import log
-from kb_escher.installed_clients.authclient import KBaseAuth as _KBaseAuth
+from kb_escher.authclient import KBaseAuth as _KBaseAuth
 
 try:
     from ConfigParser import ConfigParser

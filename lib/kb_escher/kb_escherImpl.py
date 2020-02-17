@@ -8,6 +8,7 @@ import uuid
 import shutil
 
 import escher
+import cobrakbase
 import modelseed_escher
 
 from kb_escher.utils import mkdir_p
