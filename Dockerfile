@@ -22,7 +22,10 @@ RUN pip install cobrakbase
 RUN pip install /opt/build/modelseed-escher
 RUN pip install networkx
 # -----------------------------------------
-
+RUN mkdir -p /kb/module/data/html/data/map_base
+RUN mkdir -p /kb/module/data/html/data/map_model
+RUN mkdir -p /kb/module/data/html/data/datasets
+RUN mkdir -p /kb/module/data/html/data/models
 RUN mkdir -p /root/.cache/escher/1-0-0/5/maps/ModelSEED
 COPY maps/ModelSEED /root/.cache/escher/1-0-0/5/maps/ModelSEED
 
