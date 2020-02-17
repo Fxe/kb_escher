@@ -54,7 +54,7 @@
 <body>
 <div class="container-fluid fill_height">
   <div id="top_bar">
-    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Setup Pathway Viewer</button>
+    <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Setup Pathway Viewer</button> -->
   </div>
   <div>
     <div id="escher_controls" class="float-left"></div>
@@ -154,6 +154,8 @@
 <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
 <script src="js/dataTables.bootstrap4.min.js"></script>
 <script src="js/curation_api.js"></script>
+<script src="js/curation_env.js"></script>
+<script src="js/widget_escher_modelseed.js"></script>
 <script src="js/escher_map.js"></script>
 <script src="js/escher_shadow.js"></script>
 <script>
@@ -163,6 +165,8 @@
   let current_metabolite_data = {};
   let current_gene_data = {};
   let models = ['iML1515', 'KBase'];
+
+
 
   const clear_flux_model = function(model_id) {
     console.log('CLEAR (REACTION)', model_id)
@@ -335,25 +339,18 @@ $.getJSON("data/map_decorators.json", function(o) {
     table.rows.add(rows).draw();
   });
 
-  let build_config = {
-    maps : [
-      'model;c;c;base_map.json',
-      'model;c;c;base_map.json',
-      'model;c;c;base_map.json'
-    ],
-    x : 3,
-    y : 2
-  };
+  let viewer_config = {};
 
   let omg = null;
   let current_map = null;
-  $.getJSON("data/map_config.json", function(config) {
-    build_config = config;
+  $.getJSON("data/viewer_config.json", function(config) {
+    viewer_config = config;
+    let build_config = config['grid_config'];
     $.getJSON("data/models/iML1515.json", function(e_model) {
       $.getJSON("data/escher_map.json", function(e_map) {
         current_map = e_map;
         let e_options = {
-          menu: 'zoom',
+          menu: 'all', //config['menu'],
           fill_screen: false
           //tooltip_component: tooltip,
         };
@@ -364,6 +361,19 @@ $.getJSON("data/map_decorators.json", function(o) {
         console.log('Grid Layout', shadow_grid_layout);
 
         draw_show_grid_layout2(shadow_grid_layout, $);
+
+        if (viewer_config['default_rxn_data']) {
+          $.getJSON("data/" + viewer_config['default_rxn_data'], function(d) {
+            current_flux_data = d;
+            update_flux_data();
+
+          });
+        }
+
+        let env = new CurationEnvironment(null, [
+          new WidgetEscherModelseed($('#top_bar'), e_builder, false, true)
+        ]);
+        env.init_ui();
       });
     });
   });

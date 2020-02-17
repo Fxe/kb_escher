@@ -40,6 +40,10 @@ parameters :
         ui-name : model_id
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
+    model_compartment_id :
+        ui-name : model_compartment_id
+        short-hint : kbase_compartment_id_hint
+        long-hint  : kbase_compartment_id_lhint
     model_alias :
         ui-name : model_alias
         short-hint : kbase_compartment_id_hint

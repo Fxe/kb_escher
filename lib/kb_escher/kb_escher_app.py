@@ -24,6 +24,9 @@ class KBaseEscher:
             'maps' : []
         }
         
+        self.global_rxn_data = None
+        
+        self.object_cache = {}
         self.base_maps = {}
         self.model_alias = {}
         self.model_names = {}
@@ -31,7 +34,10 @@ class KBaseEscher:
         self.viewer_config = {
             'map_list' : False,
             'menu' : 'zoom',
-            'tooltip_component' : None
+            'tooltip_component' : None,
+            'default_rxn_data' : None,
+            'default_cpd_data' : None,
+            'default_gene_data' : None
         }
         
         if not config == None:
@@ -48,9 +54,14 @@ class KBaseEscher:
         grid_cells = len(config['grid_maps'])
         self.grid_size = (column_size, math.ceil(grid_cells / column_size))
         
+        grid_cell_num = 0
+        
         for grid_cell in config['grid_maps']:
             print(grid_cell)
             map_id = None
+            rxn_data = None
+            cpd_data = None
+            gene_data = None
             if not grid_cell['map_id'] == 'custom':
                 map_id = grid_cell['map_id']
                 if not map_id in self.base_maps:
@@ -73,48 +84,74 @@ class KBaseEscher:
                 data = self.get_object_from_ref(grid_cell['model_id'])
                 self.model_cache[grid_cell['model_id']] = KBaseFBAModel(data)
                 self.model_names[grid_cell['model_id']] = ref.id
-                if 'model_alias' in grid_cell:
-                    self.model_alias[grid_cell['model_id']] = grid_cell['model_alias']
+
+            alias = str(grid_cell_num)
+            
+            if 'model_alias' in grid_cell and len(grid_cell['model_alias'].strip()) > 0:
+                alias = grid_cell['model_alias']
+
+            
+            grid_cell_num +=1
+            
+            if 'object_ids' in grid_cell and not grid_cell['object_ids'] in self.object_cache:
+                self.object_cache[grid_cell['object_ids']] = self.get_object_from_ref(grid_cell['object_ids'])
+            rxn_data = grid_cell['object_ids']
             
             self.em_data.append({
                 'map_id' : map_id,
                 'model_id' : grid_cell['model_id'],
-                'cmp' : 'c0'
+                'cmp' : 'c0',
+                'alias' : alias,
+                'rxn_data' : rxn_data
             })
         
     def build(self):
         self.em_list = []
-        grid_cell_num = 0
+        self.global_rxn_data = {}
         for grid_cell in self.em_data:
             escher_map = self.base_maps[grid_cell['map_id']]
             fbamodel = self.model_cache[grid_cell['model_id']]
             cmp_id = grid_cell['cmp']
-            alias = str(grid_cell_num)
-            if grid_cell['model_id'] in self.model_alias:
-                alias = self.model_alias[grid_cell['model_id']]
+            alias = grid_cell['alias']
             em_cell = self.build_grid_cell(escher_map, fbamodel, 
                                                 cmp_id = cmp_id, alias = alias)
             self.em_list.append(em_cell)
-            grid_cell_num +=1
-
+            
+            odata = self.object_cache[grid_cell['rxn_data']]
+            fba = cobrakbase.core.KBaseFBA(odata)
+            flux_dist = {}
+            for o in fba.data['FBAReactionVariables']:
+                rxn_id = o['modelreaction_ref'].split('/')[-1]
+                flux_dist[rxn_id + '@' + grid_cell['alias']] = o['value']
+            map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
+            f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
+            for k in f_dict:
+                self.global_rxn_data[k] = f_dict[k]
+                
         grid = modelseed_escher.EscherGrid()
         grid_map = grid.build(self.em_list, self.grid_size)
         self.grid_map = grid_map
         return self.grid_map
     
     def export(self, folder = '/kb/module/data/html/data/'):
-        with open(folder + '/map_config.json', 'w') as fh:
-            fh.write(json.dumps({
+        if not self.global_rxn_data == None and not len(self.global_rxn_data) == 0:
+            self.viewer_config['default_rxn_data'] = 'global_rxn_data.json'
+            with open(folder + '/global_rxn_data.json', 'w') as fh:
+                fh.write(json.dumps(self.global_rxn_data))
+
+        self.viewer_config['grid_config'] = {
                 'x' : self.grid_size[0],
                 'y' : self.grid_size[1],
                 'maps' : list(map(lambda x : ';'.join([
                     self.model_names[x['model_id']], 
-                    'c0', 'z', 
+                    x['cmp'], 'z', 
                     x['map_id']]
                 ), self.em_data))
-            }))
-        
-        
+            }
+
+        with open(folder + '/viewer_config.json', 'w') as fh:
+            fh.write(json.dumps(self.viewer_config))
+
         for map_id in self.base_maps:
             with open(folder + '/map_base/' + map_id + '.json', 'w') as fh:
                 fh.write(json.dumps(self.base_maps[map_id].escher_map))
