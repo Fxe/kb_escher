@@ -11,7 +11,7 @@ import escher
 import modelseed_escher
 
 from kb_escher.utils import mkdir_p
-from kb_escher.kb_escher import KBaseEscher
+from kb_escher.kb_escher_app import KBaseEscher
 
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.DataFileUtilClient import DataFileUtil
