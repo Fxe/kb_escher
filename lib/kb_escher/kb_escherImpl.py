@@ -8,14 +8,11 @@ import uuid
 import shutil
 
 import escher
-import cobra
-import cobrakbase
 import modelseed_escher
-from cobrakbase.core import KBaseFBAModel
-from modelseed_escher.core import EscherMap
 
 from kb_escher.utils import mkdir_p
-from kb_escher.kb_escher_utils import adapt_map_to_model
+from kb_escher.kb_escher import KBaseEscher
+
 from installed_clients.KBaseReportClient import KBaseReport
 from installed_clients.DataFileUtilClient import DataFileUtil
 from installed_clients.WorkspaceClient import Workspace
@@ -100,38 +97,10 @@ class kb_escher:
         api = cobrakbase.KBaseAPI(ctx['token'], config={'workspace-url' : self.ws_url})
         escher_seed = modelseed_escher.EscherManager(escher)
         
-        column_size = int(params['column_size'])
-        grid_cells = len(params['grid_maps'])
-        grid_size = (column_size, math.ceil(grid_cells / column_size))
+        kb_escher = KBaseEscher(params, api, escher_seed)
         
-        def build_grid_cell(grid_cell, escher_seed, api):
-            em = None
-            if not grid_cell['map_id'] == 'custom':
-                em = escher_seed.get_map('ModelSEED', 'ModelSEED', grid_cell['map_id'])
-            else:
-                ref = api.get_object_info_from_ref(grid_cell['user_map_id'])
-                map_data = api.get_object(ref.id, ref.workspace_id)
-                em = modelseed_escher.core.EscherMap([map_data['metadata'], map_data['layout']])
-
-            cmp_id = 'c0' #should come from parameters
-            ref = api.get_object_info_from_ref(grid_cell['model_id'])
-            fbamodel = KBaseFBAModel(api.get_object(ref.id, ref.workspace_id))
-            alias = None
-            if alias == None:
-                alias = ref.id
-            em = adapt_map_to_model(em, cmp_id, alias, fbamodel)
-            return em
-        
-        em_list = []
-        for grid_cell in params['grid_maps']:
-            em = build_grid_cell(grid_cell, escher_seed, api)
-            em_list.append(em)
-        
-        grid = modelseed_escher.EscherGrid()
-        grid_map = grid.build(em_list, grid_size)
-        
-        with open('/kb/module/data/html/data/escher_map.json', 'w') as fh:
-            fh.write(json.dumps(grid_map.escher_map))
+        kb_escher.build()
+        kb_escher.export()
         
         output_directory = os.path.join(self.shared_folder, str(uuid.uuid4()))
         mkdir_p(output_directory)

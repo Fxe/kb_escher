@@ -51,7 +51,7 @@ const draw_show_grid_layout = function(shadow_grid_layout, api) {
 const draw_show_grid_layout2 = function(shadow_grid_layout, jquery) {
   if (_.size(shadow_grid_layout) > 0) {
     let map_id = _.keys(shadow_grid_layout).pop();
-    jquery.getJSON('data/map_model/' +  map_id, function(map_data) {
+    jquery.getJSON('data/map_base/' +  map_id + '.json', function(map_data) {
       _.each(shadow_grid_layout[map_id], function(draw_coordinates) {
         let xx = draw_coordinates[0];
         let yy = draw_coordinates[1];

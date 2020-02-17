@@ -346,22 +346,26 @@ $.getJSON("data/map_decorators.json", function(o) {
   };
 
   let current_map = null;
-  $.getJSON("data/models/iML1515.json", function(e_model) {
-    $.getJSON("data/escher_map.json", function(e_map) {
-      current_map = e_map;
-      let e_options = {
-        //menu: 'zoom',
-        fill_screen: false
-        //tooltip_component: tooltip,
-      };
-      //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
-      e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
+  $.getJSON("data/map_config.json", function(config) {
+    build_config = config;
+    $.getJSON("data/models/iML1515.json", function(e_model) {
+      $.getJSON("data/escher_map.json", function(e_map) {
+        current_map = e_map;
+        let e_options = {
+          menu: 'zoom',
+          fill_screen: false
+          //tooltip_component: tooltip,
+        };
+        //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
+        e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
 
-      let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
-      console.log(shadow_grid_layout);
-      draw_show_grid_layout2(shadow_grid_layout, $);
+        let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
+        console.log(shadow_grid_layout);
+        draw_show_grid_layout2(shadow_grid_layout, $);
+      });
     });
   });
+
 
   /*
 

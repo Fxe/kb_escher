@@ -7,7 +7,7 @@
     "categories": ["active", "metabolic_modeling"],
     "widgets": {
         "input": null,
-        "output": null
+        "output": "no-display"
     },
    "parameter-groups": [
       {
@@ -109,7 +109,7 @@
       "advanced": false,
       "allow_multiple": false,
       "default_values": [
-        ""
+        "null"
       ],
       "field_type": "text",
       "text_options": {
@@ -124,7 +124,7 @@
       "advanced": false,
       "allow_multiple": false,
       "default_values": [
-        ""
+        "null"
       ],
       "field_type": "text",
       "text_options": {
@@ -496,7 +496,7 @@
       "optional": true,
       "advanced": false,
       "allow_multiple": false,
-      "default_values": [""],
+      "default_values": ["null"],
       "field_type": "text",
       "text_options": {"valid_ws_types": ["KBaseFBA.EscherMap"]}
     },
