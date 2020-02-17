@@ -12,7 +12,12 @@ const get_shadow_grid_layout = function(canvas, config) {
         if (!shadow_grid_layout[map_id]) {
           shadow_grid_layout[map_id] = [];
         }
-        shadow_grid_layout[map_id].push([yy, xx, w, h, map_config[2]]);
+        shadow_grid_layout[map_id].push([
+          yy, xx,
+          w, h,
+          map_config[2],
+          map_config[0]
+        ]);
       }
       index++;
     }
@@ -52,6 +57,7 @@ const draw_show_grid_layout2 = function(shadow_grid_layout, jquery) {
   if (_.size(shadow_grid_layout) > 0) {
     let map_id = _.keys(shadow_grid_layout).pop();
     jquery.getJSON('data/map_base/' +  map_id + '.json', function(map_data) {
+      //console.log();
       _.each(shadow_grid_layout[map_id], function(draw_coordinates) {
         let xx = draw_coordinates[0];
         let yy = draw_coordinates[1];
@@ -59,7 +65,7 @@ const draw_show_grid_layout2 = function(shadow_grid_layout, jquery) {
         let h = draw_coordinates[3];
         let x_offset = (xx * w) + -1 * map_data[1].canvas.x;
         let y_offset = (yy * h) + -1 * map_data[1].canvas.y;
-        draw_shadow_map(map_data, x_offset, y_offset);
+        draw_shadow_map(map_data, x_offset, y_offset, map_id, draw_coordinates[5]);
       });
       //let draw_coordinates = shadow_grid_layout[map_id];
       //console.log(map_id, draw_coordinates);
@@ -70,12 +76,12 @@ const draw_show_grid_layout2 = function(shadow_grid_layout, jquery) {
       //console.log(map_id, x_offset, y_offset);
 
       delete shadow_grid_layout[map_id];
-      draw_show_grid_layout(shadow_grid_layout, jquery);
+      draw_show_grid_layout2(shadow_grid_layout, jquery);
     });
   }
 };
 
-const draw_shadow_map = function(map, x_offset = 0, y_offset = 0) {
+const draw_shadow_map = function(map, x_offset = 0, y_offset = 0, map_label = undefined, model_label = undefined) {
   if (d3.select('#ghost').empty()) {
     d3.select('.escher-svg').select('g').append('g').attr('id', 'ghost');
 
@@ -85,14 +91,20 @@ const draw_shadow_map = function(map, x_offset = 0, y_offset = 0) {
   //d3.select('#ghost')
   let g = d3.select('#ghost').append('g').attr('class', 'node');
 
-  g.append('text')
-    .attr('class', 'node-label-ghost label-ghost')
-    .attr('visibility', 'visible')
-    .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 40) + ')').text('WAAAAAAAAAAAAAAA');
-  g.append('text')
-    .attr('class', 'node-label-ghost label-ghost')
-    .attr('visibility', 'visible')
-    .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 80) + ')').text('WAAAAAAAAAAAAAAA');
+  if (map_label) {
+    g.append('text')
+      .attr('class', 'node-label-ghost label-ghost')
+      .attr('visibility', 'visible')
+      .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 40) + ')').text(map_label);
+  }
+  if (model_label) {
+    g.append('text')
+      .attr('class', 'node-label-ghost label-ghost')
+      .attr('visibility', 'visible')
+      .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 80) + ')').text(model_label);
+  }
+
+
 
   _.each(map[1].reactions, function(n, uid) {
     let label_x = n.label_x + x_offset;

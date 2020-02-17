@@ -345,6 +345,7 @@ $.getJSON("data/map_decorators.json", function(o) {
     y : 2
   };
 
+  let omg = null;
   let current_map = null;
   $.getJSON("data/map_config.json", function(config) {
     build_config = config;
@@ -360,7 +361,8 @@ $.getJSON("data/map_decorators.json", function(o) {
         e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
 
         let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
-        console.log(shadow_grid_layout);
+        console.log('Grid Layout', shadow_grid_layout);
+
         draw_show_grid_layout2(shadow_grid_layout, $);
       });
     });
