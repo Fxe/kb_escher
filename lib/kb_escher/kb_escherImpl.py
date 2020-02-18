@@ -67,13 +67,47 @@ class kb_escher:
         # ctx is the context object
         # return variables are: output
         #BEGIN run_kb_escher
+        ws = params['workspace_name']
+        print(params)
+        
+        output_directory = os.path.join(self.shared_folder, str(uuid.uuid4()))
+        mkdir_p(output_directory)
+        
+        print('output_directory', output_directory, os.listdir(output_directory))
+        shutil.copytree('/kb/module/data/html', output_directory + '/report')
+        
+        print(output_directory)
+        
+        shock_id = self.dfu.file_to_shock({
+            'file_path': output_directory + '/report',
+            'pack': 'zip'
+        })['shock_id']
+        
+        html_report = []
+        html_report.append({
+            'shock_id': shock_id,
+            'name': 'index.html',
+            'label': 'HTML Report',
+            'description': 'Escher Pathway Explorer'
+        })
+        
         report = KBaseReport(self.callback_url)
-        report_info = report.create({'report': {'objects_created':[],
-                                                'text_message': params['parameter_1']},
-                                                'workspace_name': params['workspace_name']})
+        
+        report_params = {
+            'message': 'message_in_app ' + output_directory,
+            'warnings': ['example warning'],
+            'workspace_name': ws,
+            'objects_created': [],
+            'html_links': html_report,
+            'direct_html_link_index': 0,
+            'html_window_height': int(params['report_height']),
+        }
+        
+        report_info = report.create_extended_report(report_params)
+        
         output = {
-            'report_name': report_info['name'],
-            'report_ref': report_info['ref'],
+            'report_name': report_info['name'], 
+            'report_ref': report_info['ref']
         }
         #END run_kb_escher
 

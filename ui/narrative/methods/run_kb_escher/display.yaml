@@ -24,14 +24,31 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-    parameter_1 :
-        ui-name : |
-            First parameter
-        short-hint : |
-            The first parameter
-        long-hint  : |
-            The first parameter that needs to be entered to drive the method. This might be the first of many.
-
+    user_map_id:
+        ui-name : Narrative Map
+        short-hint : Custom Map
+        long-hint  : Custom Map in the narrative workspace.
+    model_id :
+        ui-name : Metabolic Model
+        short-hint : kbase_compartment_id_hint
+        long-hint  : kbase_compartment_id_lhint
+    model_alias :
+        ui-name : Metabolic Model Alias
+        short-hint : kbase_compartment_id_hint
+        long-hint  : kbase_compartment_id_lhint
+    object_ids :
+        ui-name : Pathway Data
+        short-hint : model_compartment_id_hint
+        long-hint  : model_compartment_id_lhint
+    report_height :
+        ui-name : Report Height
+        short-hint : Report Height
+        long-hint  : Report Height (in pixels)
+parameter-groups:
+    map_data :
+        ui-name : Grid Data
+        short-hint : Configure Pathway Content
+        long-hint  : Configure Pathway Content
 description : |
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pulvinar efficitur felis, quis tincidunt sem congue at. Vivamus ornare feugiat faucibus. Fusce tincidunt mattis nunc, nec varius purus convallis quis. Nulla facilisi. In at magna dolor. Suspendisse sit amet felis at arcu auctor dapibus vitae pharetra dui. Nam semper mi quis tortor fermentum mollis. Donec a arcu pharetra, rutrum dolor vitae, rutrum mauris. Donec ornare fringilla sagittis. Nam laoreet est in elementum malesuada. Vestibulum id mi eget urna hendrerit feugiat. Donec et ultrices nulla. Phasellus diam eros, dapibus at tempus nec, semper vel ante.</p>
 
