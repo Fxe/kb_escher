@@ -120,15 +120,15 @@ class kb_escher:
         html_report.append({
             'shock_id': shock_id,
             'name': 'index.html',
-            'label': 'viewer',
-            'description': 'description'
+            'label': 'HTML Report',
+            'description': 'Escher Pathway Map'
         })
         
         report = KBaseReport(self.callback_url)
         
         report_params = {
             'message': 'message_in_app ' + output_directory,
-            'warnings': ['warnings_in_app'],
+            'warnings': ['example warning'],
             'workspace_name': ws,
             'objects_created': [],
             'html_links': html_report,

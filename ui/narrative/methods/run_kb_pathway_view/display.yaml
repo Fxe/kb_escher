@@ -4,7 +4,7 @@
 name: Escher Pathway Viewer
 
 tooltip: |
-    Perform some kind of method
+    Display Metabolic Pathways
 
 screenshots: []
 
@@ -25,61 +25,80 @@ suggestions:
 #
 parameters :
     column_size :
-        ui-name : column_size
-        short-hint : FBAModel
-        long-hint  : FBAModel
+        ui-name : Max Column Size
+        short-hint : Number of columns in the grid.
+        long-hint  : Max column size of the grid. If column size is greater than number of grid cells empty canvas slots will be displayed.
     map_id:
-        ui-name : map_id
-        short-hint : kbase_compartment_id_hint
-        long-hint  : kbase_compartment_id_lhint
+        ui-name : Map Catalog
+        short-hint : Pathway Map Catalog
+        long-hint  : Pathway Map Catalog. To use a custom map select Narrative Workspace Map then select the map object in the field below (Narrative Map).
     user_map_id:
-        ui-name : user_map_id
-        short-hint : kbase_compartment_id_hint
-        long-hint  : kbase_compartment_id_lhint
+        ui-name : Narrative Map
+        short-hint : Custom Map
+        long-hint  : Custom Map in the narrative workspace.
     model_id :
-        ui-name : model_id
+        ui-name : Metabolic Model
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
     model_compartment_id :
-        ui-name : model_compartment_id
+        ui-name : Metabolic Model Compartment
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
     model_alias :
-        ui-name : model_alias
+        ui-name : Metabolic Model Alias
         short-hint : kbase_compartment_id_hint
         long-hint  : kbase_compartment_id_lhint
     object_ids :
-        ui-name : object_ids
+        ui-name : Flux Analysis Data
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
     cpd_abundance :
-        ui-name : cpd_abundance
+        ui-name : Compound Abudance Matrix
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
     cpd_abundance_dataset :
-        ui-name : cpd_abundance_dataset
+        ui-name : Compound Abudance Data Dataset
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
     gene_expression :
-        ui-name : gene_expression
+        ui-name : Gene Expression Matrix
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
     gene_expression_dataset :
-        ui-name : gene_expression_dataset
+        ui-name : Gene Expression Data Dataset
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint        
     report_height :
-        ui-name : report_height
-        short-hint : report_height
-        long-hint  : report_height
+        ui-name : Report Height
+        short-hint : Report Height
+        long-hint  : Report Height (in pixels)
 parameter-groups:
     grid_maps :
-        ui-name : grid_maps
-        short-hint : Use this control to explicitly specify how model compartments correspond to compartments in KBase
-        long-hint  : Use this control to explicitly specify how model compartments correspond to compartments in KBase
+        ui-name : Grid Cells
+        short-hint : Configure Pathway Maps for the Grid
+        long-hint  : Each grid cell will fill a row until max column.
 description : |
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pulvinar efficitur felis, quis tincidunt sem congue at. Vivamus ornare feugiat faucibus. Fusce tincidunt mattis nunc, nec varius purus convallis quis. Nulla facilisi. In at magna dolor. Suspendisse sit amet felis at arcu auctor dapibus vitae pharetra dui. Nam semper mi quis tortor fermentum mollis. Donec a arcu pharetra, rutrum dolor vitae, rutrum mauris. Donec ornare fringilla sagittis. Nam laoreet est in elementum malesuada. Vestibulum id mi eget urna hendrerit feugiat. Donec et ultrices nulla. Phasellus diam eros, dapibus at tempus nec, semper vel ante.</p>
+    <p>Escher is a web tool for visualizing metabolic models and related data. The KBase tool adapts the original Escher web application to visualize metabolic models and its related data in the KBase context.</p>
 
-    <p>Curabitur auctor, metus at tristique euismod, odio elit tincidunt neque, a facilisis sem massa convallis dolor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nunc ut hendrerit tellus. Nunc lacinia laoreet finibus. Etiam vitae sagittis enim. Fusce consectetur porta est eu pretium. In hac habitasse platea dictumst. Integer pellentesque sit amet sapien id venenatis. Nullam ac risus at orci eleifend aliquet. Vestibulum elit purus, euismod a nibh quis, pellentesque semper leo. Curabitur ullamcorper felis hendrerit nunc egestas, sit amet pharetra sapien porttitor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Maecenas hendrerit ipsum a ligula aliquet vestibulum. Duis a ante urna. Aenean ante neque, rhoncus id luctus ut, accumsan vel nunc.</p>
+    <p>The Escher Pathway Viewer application allows users to display metabolic pathways.</p>
 
-    <p>Pellentesque accumsan aliquet magna, id consectetur tellus condimentum eu. Suspendisse elit dui, ornare ac leo eget, tincidunt feugiat orci. Maecenas auctor gravida lacinia. Mauris interdum nisi vel gravida varius. Nullam tempus, purus eget posuere aliquet, odio elit semper massa, quis facilisis massa odio vitae lacus. Fusce varius enim a mi vehicula tempus. Maecenas faucibus tellus ipsum, at venenatis ipsum auctor et. Suspendisse sem mi, dignissim id porta efficitur, auctor eget magna. Vivamus varius purus nulla, porttitor euismod lorem cursus quis. Nulla sit amet eros nec sem ultrices pulvinar.</p>
+    <ul>
+      <li>Compose metabolic pathways: Combine multiple pathways in a grid system that allows to display multiple pathways in a single canvas.</li>
+      <li>Display Reaction Fluxes: Paint flux analysis result in the network displayed network.</li>
+      <li>Display Metabolic Data: Visualize compound abundance matrices in model pathways</li>
+      <li>Display Expression Data: Highlight expression data in the metabolic model pathway</li>
+    </ul>
+    
+
+publications :
+    -
+        display-text: |
+            [1] King, Z. A., Dräger, A., Ebrahim, A., Sonnenschein, N., Lewis, N. E., & Palsson, B. Ø. (2015). Escher: A Web Application for Building, Sharing, and Embedding Data-Rich Visualizations of Biological Pathways. PLOS Computational Biology, 11(8), e1004321.
+        link: https://doi.org/10.1371/journal.pcbi.1004321
+    -
+        display-text: |
+            [2] Rowe, E., Palsson, B. Ø., & King, Z. A. (2018). Escher-FBA: a web application for interactive flux balance analysis. BMC Systems Biology, 12(1), 84.
+        link: https://doi.org/10.1186/s12918-018-0607-5
+        
+        
+        
