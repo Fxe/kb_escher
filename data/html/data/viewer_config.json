@@ -1,1 +1,10 @@
-{"map_list": false, "menu": "zoom", "tooltip_component": null, "default_rxn_data": null, "default_cpd_data": null, "default_gene_data": null, "grid_config": {"x": 2, "y": 2, "maps": ["iML1515.kb;c0;z;Pyrimidine Utilization", "iML1515.kb;c0;z;NAD(P) Biosynthesis", "GCF_000005845.2.beta.mdl;c0;z;NAD(P) Biosynthesis", "GCF_000005845.2.beta.mdl;c0;z;Pyrimidine Utilization"]}}
+{
+    "map_list": false, 
+    "base_model" : "model.json",
+    "menu": "zoom", 
+    "tooltip_component": null, 
+    "default_rxn_data": null, 
+    "default_cpd_data": null, 
+    "default_gene_data": "global_gene_data.json", 
+    "rxn_mode" : false,
+    "grid_config": {"x": 1, "y": 1, "maps": ["iML1515.kb;c0;z;NAD(P) Biosynthesis"]}}

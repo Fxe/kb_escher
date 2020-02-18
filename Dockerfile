@@ -11,16 +11,17 @@ MAINTAINER KBase Developer
 #RUN mkdir -p /opt/data
 #RUN git clone https://github.com/ModelSEED/ModelSEEDDatabase.git /opt/data/ModelSEEDDatabase
 
+RUN pip install cobra==0.17.1
+RUN pip install cobrakbase==0.2.3
+RUN pip install networkx
+
 RUN mkdir -p /opt/build
 RUN git clone https://github.com/ModelSEED/modelseed-escher.git /opt/build/modelseed-escher
 
 RUN pip install --upgrade pip
 
-
-RUN pip install cobra
-RUN pip install cobrakbase
 RUN pip install /opt/build/modelseed-escher
-RUN pip install networkx
+
 # -----------------------------------------
 RUN mkdir -p /kb/module/data/html/data/map_base
 RUN mkdir -p /kb/module/data/html/data/map_model

@@ -346,7 +346,7 @@ $.getJSON("data/map_decorators.json", function(o) {
   $.getJSON("data/viewer_config.json", function(config) {
     viewer_config = config;
     let build_config = config['grid_config'];
-    $.getJSON("data/models/iML1515.json", function(e_model) {
+    $.getJSON("data/models/model.json", function(e_model) {
       $.getJSON("data/escher_map.json", function(e_map) {
         current_map = e_map;
         let e_options = {
@@ -373,6 +373,14 @@ $.getJSON("data/map_decorators.json", function(o) {
           $.getJSON("data/" + viewer_config['default_cpd_data'], function(d) {
             current_metabolite_data = d;
             update_metabolite_data();
+
+          });
+        }
+
+        if (viewer_config['default_gene_data']) {
+          $.getJSON("data/" + viewer_config['default_gene_data'], function(d) {
+            current_gene_data = d;
+            update_gene_data();
 
           });
         }
