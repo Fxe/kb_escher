@@ -369,6 +369,13 @@ $.getJSON("data/map_decorators.json", function(o) {
 
           });
         }
+        if (viewer_config['default_cpd_data']) {
+          $.getJSON("data/" + viewer_config['default_cpd_data'], function(d) {
+            current_metabolite_data = d;
+            update_metabolite_data();
+
+          });
+        }
 
         let env = new CurationEnvironment(null, [
           new WidgetEscherModelseed($('#top_bar'), e_builder, false, true)

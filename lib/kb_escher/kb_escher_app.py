@@ -7,6 +7,13 @@ from cobrakbase.core.converters import KBaseFBAModelToCobraBuilder
 from modelseed_escher.core import EscherMap
 from modelseed_escher.convert_utils import move_to_compartment
 
+def is_empty(s):
+    if s == None:
+        return True
+    if len(s.strip()) == 0:
+        return True
+    return False
+
 class KBaseEscher:
     
     def __init__(self, config, kbase_api, escher_api):
@@ -32,6 +39,7 @@ class KBaseEscher:
         self.model_names = {}
         self.model_cache = {}
         self.viewer_config = {
+            'rxn_mode' : True,
             'map_list' : False,
             'menu' : 'zoom',
             'tooltip_component' : None,
@@ -43,6 +51,27 @@ class KBaseEscher:
         if not config == None:
             self.setup_config(config)
             
+    def get_chemical_abundance_data(self, data, dataset):
+        row_attributemapping_ref = data['row_attributemapping_ref']
+        mapping = self.object_cache[row_attributemapping_ref]
+
+        col_index = None
+        result = {}
+        try:
+            col_index = data['data']['col_ids'].index(dataset)
+        except ValueError:
+            return None
+
+        for i in range(len(data['data']['row_ids'])):
+            k = data['data']['row_ids'][i]
+            v = data['data']['values'][i][col_index]
+            if not v == None:
+                if k in mapping['instances'] and len(mapping['instances'][k][5]) > 0:
+                    result[mapping['instances'][k][5]] = v
+                else:
+                    result[k] = v
+
+        return result
             
     def get_object_from_ref(self, ref_str):
         ref = self.kbase_api.get_object_info_from_ref(ref_str)
@@ -93,21 +122,41 @@ class KBaseEscher:
             
             grid_cell_num +=1
             
-            if 'object_ids' in grid_cell and not grid_cell['object_ids'] in self.object_cache:
+            if not is_empty(grid_cell['object_ids']) and not grid_cell['object_ids'] in self.object_cache:
                 self.object_cache[grid_cell['object_ids']] = self.get_object_from_ref(grid_cell['object_ids'])
             rxn_data = grid_cell['object_ids']
+            
+            if not is_empty(grid_cell['cpd_abundance']) and not is_empty(grid_cell['cpd_abundance_dataset']):
+                if not grid_cell['cpd_abundance'] in self.object_cache:
+                    self.object_cache[grid_cell['cpd_abundance']] = self.get_object_from_ref(grid_cell['cpd_abundance'])
+                row_attributemapping_ref = self.object_cache[grid_cell['cpd_abundance']]['row_attributemapping_ref']
+                if not row_attributemapping_ref in self.object_cache:
+                    self.object_cache[row_attributemapping_ref] = self.get_object_from_ref(row_attributemapping_ref)
+                cpd_data = (grid_cell['cpd_abundance'], grid_cell['cpd_abundance_dataset'])
+                
+            if not is_empty(grid_cell['gene_expression']) and not is_empty(grid_cell['gene_expression_dataset']):
+                if not grid_cell['gene_expression'] in self.object_cache:
+                    self.object_cache[grid_cell['gene_expression']] = self.get_object_from_ref(grid_cell['gene_expression'])
+                    
+                gene_data = (grid_cell['gene_expression'], grid_cell['gene_expression_dataset'])
+            
             
             self.em_data.append({
                 'map_id' : map_id,
                 'model_id' : grid_cell['model_id'],
                 'cmp' : 'c0',
                 'alias' : alias,
-                'rxn_data' : rxn_data
+                'rxn_data' : rxn_data,
+                'cpd_data' : cpd_data,
+                'gene_data' : gene_data
             })
         
     def build(self):
         self.em_list = []
         self.global_rxn_data = {}
+        self.global_cpd_data = {}
+        self.global_gene_data = {}
+        
         for grid_cell in self.em_data:
             escher_map = self.base_maps[grid_cell['map_id']]
             fbamodel = self.model_cache[grid_cell['model_id']]
@@ -117,16 +166,31 @@ class KBaseEscher:
                                                 cmp_id = cmp_id, alias = alias)
             self.em_list.append(em_cell)
             
-            odata = self.object_cache[grid_cell['rxn_data']]
-            fba = cobrakbase.core.KBaseFBA(odata)
-            flux_dist = {}
-            for o in fba.data['FBAReactionVariables']:
-                rxn_id = o['modelreaction_ref'].split('/')[-1]
-                flux_dist[rxn_id + '@' + grid_cell['alias']] = o['value']
-            map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
-            f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
-            for k in f_dict:
-                self.global_rxn_data[k] = f_dict[k]
+            if grid_cell['rxn_data']:
+                odata = self.object_cache[grid_cell['rxn_data']]
+                fba = cobrakbase.core.KBaseFBA(odata)
+                flux_dist = {}
+                for o in fba.data['FBAReactionVariables']:
+                    rxn_id = o['modelreaction_ref'].split('/')[-1]
+                    flux_dist[rxn_id + '@' + grid_cell['alias']] = o['value']
+                map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
+                f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
+                for k in f_dict:
+                    self.global_rxn_data[k] = f_dict[k]
+                    
+            if grid_cell['cpd_data']:
+                cpd_mat = self.object_cache[grid_cell['cpd_data'][0]]
+                cpd_data = self.get_chemical_abundance_data(cpd_mat, grid_cell['cpd_data'][1])
+                cpd_data = dict(map(lambda x : (x[0] + '_' + cmp_id + '@' + alias, x[1]), cpd_data.items()))
+                
+                filter_cpds = dict(filter(lambda x : 'bigg_id' in x[1], em_cell.escher_graph['nodes'].items()))
+                map_cpd_ids = set(map(lambda x : x[1]['bigg_id'], filter_cpds.items()))
+                for k in cpd_data:
+                    if k in map_cpd_ids:
+                        self.global_cpd_data[k] = cpd_data[k]
+                        
+            if grid_cell['gene_data']:
+                pass
                 
         grid = modelseed_escher.EscherGrid()
         grid_map = grid.build(self.em_list, self.grid_size)
@@ -138,6 +202,11 @@ class KBaseEscher:
             self.viewer_config['default_rxn_data'] = 'global_rxn_data.json'
             with open(folder + '/global_rxn_data.json', 'w') as fh:
                 fh.write(json.dumps(self.global_rxn_data))
+                
+        if not self.global_cpd_data == None and not len(self.global_cpd_data) == 0:
+            self.viewer_config['default_cpd_data'] = 'global_cpd_data.json'
+            with open(folder + '/global_cpd_data.json', 'w') as fh:
+                fh.write(json.dumps(self.global_cpd_data))
 
         self.viewer_config['grid_config'] = {
                 'x' : self.grid_size[0],

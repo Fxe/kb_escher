@@ -7,6 +7,7 @@ from modelseed_escher.convert_utils import move_to_compartment
 #{'workspace_id': 37534, 'map_ids': ['dfsdfsdf'], 'grid_x': '1', 'grid_y': '1', 'model_objects': [{'object_ids': ['37534/91/1'], 'model_id': '37534/90/3'}, {'object_ids': ['37534/92/1'], 'model_id': '37534/89/1'}], 'report_height': '800', 'workspace_name': 'filipeliu:narrative_1580723870549', 'model_ids': ['37534/90/3', '37534/89/1']}
 
 
+
 def dump_chemical_abundance_datasets(model_id, datasets, map_decorators):
     for dataset_id in datasets:
         if not model_id in map_decorators:
