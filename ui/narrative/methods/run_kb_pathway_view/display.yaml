@@ -53,13 +53,13 @@ parameters :
         short-hint : model_compartment_id_hint
         long-hint  : model_compartment_id_lhint
     cpd_abundance :
-        ui-name : Compound Abudance Matrix
-        short-hint : model_compartment_id_hint
-        long-hint  : model_compartment_id_lhint
+        ui-name : Chemical Abudance Matrix
+        short-hint : Select the Chemical Abundance Matrix 
+        long-hint  : Select the Chemical Abundance Matrix 
     cpd_abundance_dataset :
-        ui-name : Compound Abudance Data Dataset
-        short-hint : model_compartment_id_hint
-        long-hint  : model_compartment_id_lhint
+        ui-name : Chemical Abudance Condition
+        short-hint : Specify the specific condtion (Specific row heading of the matrix)
+        long-hint  : Specify the specific condtion (Specific row heading of the matrix)
     gene_expression :
         ui-name : Gene Expression Matrix
         short-hint : model_compartment_id_hint
