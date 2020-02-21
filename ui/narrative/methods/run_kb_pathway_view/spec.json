@@ -59,7 +59,7 @@
       "field_type": "checkbox",
       "checkbox_options": {
         "checked_value": true,
-        "unchecked_value": false,
+        "unchecked_value": false
       }
     },
 
