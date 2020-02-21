@@ -55,6 +55,7 @@
 <div class="container-fluid fill_height">
   <div id="top_bar">
     <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Setup Pathway Viewer</button> -->
+    Mode: <button id="toggle_gene" class="btn btn-seed-sm btn-dark"><i class="fas fa-dna"></i> Gene</button>
   </div>
   <div>
     <div id="escher_controls" class="float-left"></div>
@@ -63,85 +64,6 @@
 
 
   <div id="map_container"></div>
-
-  <div class="modal fade" id="modal_builder" tabindex="-1" role="dialog" aria-labelledby="modal_builder_label" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="max-width: 1500px">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modal_builder_label">Build Configuration</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-  <div class="row">
-    <div class="col-md-6">
-      <table id="table_map_select" class="table table-striped">
-        <thead class="thead-light">
-        <tr>
-          <th scope="col">Map</th>
-          <th scope="col">Compounds</th>
-          <th scope="col">Reactions</th>
-        </tr>
-        </thead>
-      </table>
-    </div>
-    <div class="col-md-6">
-      <div id="controls"></div>
-    </div>
-  </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <div class="form-row">
-                <div class="form-group col-md-12" style="width: 100%">
-                  <label for="select_target_map">Target Map Layout</label>
-                  <div class="select2-seed"><div id="select_target_map"></div></div>
-
-                </div>
-              </div>
-              <label for="select_target_cmp">Target Standard Compartment</label>
-              <div id="select_target_cmp"></div>
-
-              <label for="select_model">SBML Model</label>
-              <div id="select_model"></div>
-
-              <label for="select_model_cmp">SBML Compartment</label>
-              <div id="select_model_cmp"></div>
-            </div>
-            <div class="form-group col-md-6">
-              <label for="select_build_list">Build Selection:</label>
-              <select id="select_build_list" class="form-control" size="4" multiple="multiple" style="width:100%;height : 200px">
-              </select>
-
-              <label >Grid</label>
-              <label for="input_grid_x">X:</label>
-              <input id="input_grid_x" class="form-control" type="number" min="0" max="10" value="3">
-              <label for="input_grid_y">Y:</label>
-              <input id="input_grid_y" class="form-control" type="number" min="0" max="10" value="2">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <button id="button_add_map_option" class="btn btn-primary">Add</button>
-            </div>
-            <div class="form-group col-md-6">
-              <button id="button_remove_select" class="btn btn-primary">Remove</button>
-
-              <button id="button_build_map" class="btn btn-primary">Build</button>
-
-              <button id="button_merge_map" class="btn btn-success">Merge</button>
-            </div>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
 </body>
 <script src="js/d3-3.5.6.min.js"></script>
@@ -200,13 +122,20 @@
   };
 
   const update_flux_data = function() {
-    e_builder.set_reaction_data(current_flux_data);
+    if (e_builder) {
+      e_builder.set_gene_data(null);
+      e_builder.set_reaction_data(current_flux_data);
+    }
     //e_builder.map.apply_reaction_data_to_map(current_flux_data);
     //e_builder.map.draw_everything();
   };
 
   const update_gene_data = function() {
-    e_builder.set_gene_data(current_gene_data);
+    if (e_builder) {
+      e_builder.set_reaction_data(null);
+      e_builder.set_gene_data(current_gene_data);
+    }
+
     //e_builder.map.apply_reaction_data_to_map(current_flux_data);
     //e_builder.map.draw_everything();
   };
@@ -215,144 +144,48 @@
     e_builder.set_metabolite_data(current_metabolite_data);
   };
 
-  //const api = new CurationAPI();
-$.getJSON("data/map_decorators.json", function(o) {
-    console.log(o);
-    let container = $('#controls');
-    //<input type="radio" name="iML1515_FBA" value="none"> None<br>
-    _.each(o, function(decorators, model_id) {
-        console.log(model_id, decorators);
-        container.append(model_id);
-        container.append('<br>');
-        _.each(decorators, function(d_type_objects, d_supertype) {
-          container.append(d_supertype);
-          container.append('<br>');
-          _.each(d_type_objects, function(d_objects, d_type) {
-              let clear_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : 'none'});
-            if (d_supertype === 'compound') {
-              clear_input.click(function() {
-                clear_metabolite_model(model_id);
-                update_metabolite_data();
-              });
-              container.append(clear_input);
-              container.append('None <br>');
-            } else if (d_supertype === 'reaction') {
-              clear_input.click(function() {
-                clear_flux_model(model_id);
-                update_flux_data();
-              });
-              container.append(clear_input);
-              container.append('None <br>');
-            } else if (d_supertype === 'gene') {
-              clear_input.click(function() {
-                clear_gene_model(model_id);
-                update_gene_data();
-              });
-              container.append(clear_input);
-              container.append('None <br>');
-            }
+  function refresh_toggle(o) {
+    if (viewer_config['gene_mode']) {
+      $('#toggle_gene').html('<i class="fas fa-dna"></i> Gene');
+      update_gene_data();
+    } else {
+      $('#toggle_gene').html('<i class="fas fa-wave-square"></i> Flux');
+      update_flux_data();
+    }
+  }
 
-
-              _.each(d_objects, function(d_object) {
-
-                if (d_supertype === 'compound') {
-                  let change_flux_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : d_object.path});
-                  change_flux_input.click(function() {
-                    $.getJSON("data/datasets/" + d_object.path, function(o) {
-                      console.log('change_flux_input (METABOLITE)', o);
-                      _.each(o, function(v, k) {
-                        current_metabolite_data[k + '_c0@' + model_id] = [v];
-                      });
-                      //_.extend(current_flux_data, o);
-                      update_metabolite_data();
-                    });
-                    //alert('clear ' + d_object.path);
-
-                  });
-                  container.append(change_flux_input);
-                  container.append(d_object.id + ' <br>')
-                } else if (d_supertype === 'reaction') {
-                  let change_flux_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : d_object.path});
-                  change_flux_input.click(function() {
-                    $.getJSON("data/datasets/" + d_object.path, function(o) {
-                      console.log('change_flux_input (REACTION)', o);
-                      _.each(o, function(v, k) {
-                        current_flux_data[k + '@' + model_id] = [v];
-                      });
-                      //_.extend(current_flux_data, o);
-                      update_flux_data();
-                    });
-                    //alert('clear ' + d_object.path);
-
-                  });
-                  container.append(change_flux_input);
-                  container.append(d_object.id + ' <br>')
-                } else if (d_supertype === 'gene') {
-                  let change_flux_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : d_object.path});
-                  change_flux_input.click(function() {
-                    $.getJSON("data/datasets/" + d_object.path, function(o) {
-                      console.log('change_flux_input (GENE)', o, d_object.path);
-                      _.each(o, function(v, k) {
-                        //current_gene_data[k + '@' + model_id] = [v];
-                        current_gene_data[k] = v;
-                      });
-                      update_gene_data();
-                    });
-                  });
-                  container.append(change_flux_input);
-                  container.append(d_object.id + ' <br>')
-                }
-
-              })
-          })
-        });
-
-    })
-});
-    
-  $.getJSON("data/map_list.json", function(e) {
-    //console.log(e);
-    let table = $("#table_map_select").DataTable({
-      select: {
-        style: 'single'
-      }
-    });
-    let rows = [];
-    _.each(e, function (map_data, map_id) {
-      let total_cpd_in_map = 0;
-      let total_rxn_in_map = 0;
-      let in_map_cpd = [];
-      let in_map_rxn = [];
-      _.each(map_data, function (stats, model_id) {
-        total_cpd_in_map = stats['map_cpd'];
-        total_rxn_in_map = stats['map_rxn'];
-        in_map_cpd.push(stats['cpd_in_map_count']);
-        in_map_rxn.push(stats['rxn_in_map_count']);
-      });
-      let row_data = [
-        map_id,
-        total_cpd_in_map + ' (' + in_map_cpd + ')',
-        total_rxn_in_map + ' (' + in_map_rxn + ')'
-      ];
-      rows.push(row_data)
-    });
-    table.rows.add(rows).draw();
+  $('#toggle_gene').click(function(e) {
+    if (viewer_config['gene_mode']) {
+      viewer_config['gene_mode'] = false
+    } else {
+      viewer_config['gene_mode'] = true
+    }
+    refresh_toggle($('#toggle_gene'))
   });
+  //const api = new CurationAPI();
 
   let viewer_config = {};
 
+  let default_reaction_scale = [ { type: 'min', color: '#ceffdc', size: 12 },
+    { type: 'value', color: '#d5ffdb', size: 20 , value: 1e-7},
+    { type: 'max', color: '#15ff02', size: 25 } ];
+
   let omg = null;
   let current_map = null;
+  let e_builder = null;
   $.getJSON("data/viewer_config.json", function(config) {
     viewer_config = config;
+    refresh_toggle($('#toggle_gene'))
     let build_config = config['grid_config'];
     $.getJSON("data/models/model.json", function(e_model) {
       $.getJSON("data/escher_map.json", function(e_map) {
         current_map = e_map;
         let e_options = {
           menu: 'all', //config['menu'],
-          fill_screen: false
+          fill_screen: false,
           //tooltip_component: tooltip,
+          reaction_scale: default_reaction_scale,
+          never_ask_before_quit: true
         };
         //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
         e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
@@ -383,7 +216,10 @@ $.getJSON("data/map_decorators.json", function(o) {
           $.getJSON("data/" + viewer_config['default_gene_data'], function(d) {
 
             current_gene_data = d;
-            update_gene_data();
+            if (viewer_config['gene_mode']) {
+
+              refresh_toggle($('#toggle_gene'))
+            }
           });
         }
 

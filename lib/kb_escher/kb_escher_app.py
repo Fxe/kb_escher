@@ -98,6 +98,8 @@ class KBaseEscher:
         return data
     
     def setup_config(self, config):
+        if 'gene_mode' in config and config['gene_mode']:
+            self.viewer_config['gene_mode'] = True
         column_size = int(config['column_size'])
         grid_cells = len(config['grid_maps'])
         self.grid_size = (column_size, math.ceil(grid_cells / column_size))
@@ -355,7 +357,7 @@ class KBaseEscher:
                 for gene_id in and_rule:
                     gene_ids[gene_id] = None
             gpr_str = rxn.get_gpr_string(gpr)
-            print(rxn_id, gpr)
+            #print(rxn_id, gpr)
             s = rxn.stoichiometry
             metabolites = dict(map(lambda x : (x[0] + '@' + suffix, x[1]), s.items()))
             for cpd_id in s:
@@ -382,7 +384,7 @@ class KBaseEscher:
 
         for gene_id in gene_ids:
             m['genes'].append({
-                'id': "{}@{}".format(gene_id, suffix), 'name': "whollool", 'annotation': {}
+                'id': gene_id, 'name': gene_id, 'annotation': {}
             })
 
         return m

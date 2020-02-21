@@ -12,6 +12,16 @@ svg.escher-svg .node-label-ghost {
     font-size: 15px;
 }
 
+svg.escher-svg .canvas-label {
+    font-family:sans-serif;
+    font-style:italic;
+    font-weight:700;
+    fill: #3b3b3b;
+    stroke:none;
+    pointer-events: none;
+    font-size: 40px;
+}
+
 svg.escher-svg .metabolite-circle-ghost {
     stroke: #9d9c9b;
     fill: #d2d2d2;

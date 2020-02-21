@@ -9144,17 +9144,28 @@ var DefaultTooltip = createComponent({
     openBigg: function (args) {
       var type = args.state.type
       var biggId = args.state.biggId
-      var pref = 'http://bigg.ucsd.edu/'
-      var url = (type === 'gene' ?
-                 pref + 'search?query=' + biggId :
-                 pref + 'universal/' + type + 's/' + decompartmentalizeCheck(biggId, type))
+      //var pref = 'http://bigg.ucsd.edu/'
+      let mode = 'compounds';
+      if (type === 'reaction') {
+        mode = 'reactions'
+      }
+      let id = biggId;
+      if (id.indexOf('@') > 0) {
+        id = id.split('@')[0]
+      }
+      if (id.indexOf('_') > 0) {
+        id = id.split('_')[0]
+      }
+      console.log(type);
+      let url = 'http://modelseed.org/biochem/' + mode + '/' + id;
+
       window.open(url)
     },
   },
 
   render: function (args) {
-    var decomp = decompartmentalizeCheck(args.state.biggId, args.state.type)
-    var biggButtonText = 'Open ' + decomp + ' in BiGG Models.'
+    var decomp = decompartmentalizeCheck(args.state.biggId, args.state.type);
+    var biggButtonText = 'Open ' + decomp + ' in ModelSEED.';
 
     return render(
       // parent node

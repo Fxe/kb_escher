@@ -93,15 +93,15 @@ const draw_shadow_map = function(map, x_offset = 0, y_offset = 0, map_label = un
 
   if (map_label) {
     g.append('text')
-      .attr('class', 'node-label-ghost label-ghost')
+      .attr('class', 'canvas-label')
       .attr('visibility', 'visible')
-      .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 40) + ')').text(map_label);
+      .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 60) + ')').text(map_label);
   }
   if (model_label) {
     g.append('text')
-      .attr('class', 'node-label-ghost label-ghost')
+      .attr('class', 'canvas-label')
       .attr('visibility', 'visible')
-      .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 80) + ')').text(model_label);
+      .attr('transform', 'translate(' + (map[1].canvas.x + x_offset + 40) + ',' + (map[1].canvas.y + y_offset + 120) + ')').text(model_label);
   }
 
 
