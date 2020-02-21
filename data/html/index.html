@@ -356,7 +356,9 @@ $.getJSON("data/map_decorators.json", function(o) {
         };
         //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
         e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
-
+        e_builder.map.convert_map();
+        e_builder.settings.set_option('show_gene_reaction_rules', true);
+        e_builder.map.draw_everything();
         let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
         console.log('Grid Layout', shadow_grid_layout);
 
@@ -379,9 +381,9 @@ $.getJSON("data/map_decorators.json", function(o) {
 
         if (viewer_config['default_gene_data']) {
           $.getJSON("data/" + viewer_config['default_gene_data'], function(d) {
+
             current_gene_data = d;
             update_gene_data();
-
           });
         }
 

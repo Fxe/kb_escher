@@ -28,6 +28,10 @@ parameters :
         ui-name : Max Column Size
         short-hint : Number of columns in the grid.
         long-hint  : Max column size of the grid. If column size is greater than number of grid cells empty canvas slots will be displayed.
+    gene_mode :
+        ui-name : Gene Expression
+        short-hint : Set default display to gene expression.
+        long-hint  : Set default display to gene expression.
     map_id:
         ui-name : Map Catalog
         short-hint : Pathway Map Catalog

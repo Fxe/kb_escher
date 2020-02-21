@@ -32,6 +32,10 @@ class KBaseEscher:
         }
         
         self.global_rxn_data = None
+        self.global_cpd_data = None
+        self.global_gene_data = None
+        self.grid_models = []
+        self.warnings = []
         
         self.object_cache = {}
         self.base_maps = {}
@@ -39,7 +43,7 @@ class KBaseEscher:
         self.model_names = {}
         self.model_cache = {}
         self.viewer_config = {
-            'rxn_mode' : True,
+            'gene_mode' : False,
             'map_list' : False,
             'menu' : 'zoom',
             'tooltip_component' : None,
@@ -66,10 +70,25 @@ class KBaseEscher:
             k = data['data']['row_ids'][i]
             v = data['data']['values'][i][col_index]
             if not v == None:
-                if k in mapping['instances'] and len(mapping['instances'][k][5]) > 0:
+                if k in mapping['instances'] and len(mapping['instances'][k]) > 5 and len(mapping['instances'][k][5]) > 0:
                     result[mapping['instances'][k][5]] = v
                 else:
                     result[k] = v
+
+        return result
+    
+    def get_expression_data(self, data, dataset):
+        col_index = None
+        result = {}
+        try:
+            col_index = data['data']['col_ids'].index(dataset)
+        except ValueError:
+            return None
+
+        for i in range(len(data['data']['row_ids'])):
+            k = data['data']['row_ids'][i]
+            v = data['data']['values'][i][col_index]
+            result[k] = v
 
         return result
             
@@ -164,33 +183,52 @@ class KBaseEscher:
             alias = grid_cell['alias']
             em_cell = self.build_grid_cell(escher_map, fbamodel, 
                                                 cmp_id = cmp_id, alias = alias)
-            self.em_list.append(em_cell)
             
-            if grid_cell['rxn_data']:
-                odata = self.object_cache[grid_cell['rxn_data']]
-                fba = cobrakbase.core.KBaseFBA(odata)
-                flux_dist = {}
-                for o in fba.data['FBAReactionVariables']:
-                    rxn_id = o['modelreaction_ref'].split('/')[-1]
-                    flux_dist[rxn_id + '@' + grid_cell['alias']] = o['value']
-                map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
-                f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
-                for k in f_dict:
-                    self.global_rxn_data[k] = f_dict[k]
-                    
-            if grid_cell['cpd_data']:
-                cpd_mat = self.object_cache[grid_cell['cpd_data'][0]]
-                cpd_data = self.get_chemical_abundance_data(cpd_mat, grid_cell['cpd_data'][1])
-                cpd_data = dict(map(lambda x : (x[0] + '_' + cmp_id + '@' + alias, x[1]), cpd_data.items()))
+            rxn_ids = self.get_rxn_in_model(fbamodel, grid_cell['map_id'], cmp_id)
+            em_model = self.get_grid_model(rxn_ids, alias, fbamodel, alias)
+            self.em_list.append(em_cell)
+            self.grid_models.append(em_model)
+            try:
+                if grid_cell['rxn_data']:
+                    odata = self.object_cache[grid_cell['rxn_data']]
+                    fba = cobrakbase.core.KBaseFBA(odata)
+                    flux_dist = {}
+                    for o in fba.data['FBAReactionVariables']:
+                        rxn_id = o['modelreaction_ref'].split('/')[-1]
+                        flux_dist[rxn_id + '@' + grid_cell['alias']] = o['value']
+                    map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
+                    f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
+                    for k in f_dict:
+                        self.global_rxn_data[k] = f_dict[k]
+            except Exception as e:
+                self.warnings.append("failed to add rxn_data")
                 
-                filter_cpds = dict(filter(lambda x : 'bigg_id' in x[1], em_cell.escher_graph['nodes'].items()))
-                map_cpd_ids = set(map(lambda x : x[1]['bigg_id'], filter_cpds.items()))
-                for k in cpd_data:
-                    if k in map_cpd_ids:
-                        self.global_cpd_data[k] = cpd_data[k]
-                        
-            if grid_cell['gene_data']:
-                pass
+            try:
+                if grid_cell['cpd_data']:
+                    cpd_mat = self.object_cache[grid_cell['cpd_data'][0]]
+                    cpd_data = self.get_chemical_abundance_data(cpd_mat, grid_cell['cpd_data'][1])
+                    if cpd_data == None or len(cpd_data) == 0:
+                        self.warnings.append("Unable to map ModelSEED identifiers")
+                    else:
+                        cpd_data = dict(map(lambda x : (x[0] + '_' + cmp_id + '@' + alias, x[1]), cpd_data.items()))
+
+                        filter_cpds = dict(filter(lambda x : 'bigg_id' in x[1], em_cell.escher_graph['nodes'].items()))
+                        map_cpd_ids = set(map(lambda x : x[1]['bigg_id'], filter_cpds.items()))
+                        for k in cpd_data:
+                            if k in map_cpd_ids:
+                                self.global_cpd_data[k] = cpd_data[k]
+            except Exception as e:
+                self.warnings.append("failed to add cpd_data")
+                       
+            try:
+                if grid_cell['gene_data']:
+                    gene_mat = self.object_cache[grid_cell['gene_data'][0]]
+                    gene_data = self.get_expression_data(gene_mat, grid_cell['gene_data'][1])
+                    gene_data = dict(map(lambda x : (x[0] + '@' + alias, x[1]), gene_data.items()))
+                    for k in gene_data:
+                        self.global_gene_data[k] = gene_data[k]
+            except:
+                self.warnings.append("failed to add gene_data")
                 
         grid = modelseed_escher.EscherGrid()
         grid_map = grid.build(self.em_list, self.grid_size)
@@ -207,6 +245,11 @@ class KBaseEscher:
             self.viewer_config['default_cpd_data'] = 'global_cpd_data.json'
             with open(folder + '/global_cpd_data.json', 'w') as fh:
                 fh.write(json.dumps(self.global_cpd_data))
+                
+        if not self.global_gene_data == None and not len(self.global_gene_data) == 0:
+            self.viewer_config['default_gene_data'] = 'global_gene_data.json'
+            with open(folder + '/global_gene_data.json', 'w') as fh:
+                fh.write(json.dumps(self.global_gene_data))
 
         self.viewer_config['grid_config'] = {
                 'x' : self.grid_size[0],
@@ -217,7 +260,10 @@ class KBaseEscher:
                     x['map_id']]
                 ), self.em_data))
             }
-
+        
+        with open(folder + '/models/model.json', 'w') as fh:
+            fh.write(json.dumps(self.merge_models(self.grid_models, 'master')))
+        
         with open(folder + '/viewer_config.json', 'w') as fh:
             fh.write(json.dumps(self.viewer_config))
 
@@ -265,3 +311,78 @@ class KBaseEscher:
         #TODO: I WAS HERE!
 
         return em
+    
+    def get_rxn_in_model(self, fbamodel, map_id, cmp_id):
+        map_rxn_set = set()
+        model_rxns = set(map(lambda x : x.id, fbamodel.reactions))
+        em = escher_map = self.base_maps[map_id].clone()
+        move_to_compartment(cmp_id, em)
+        for rxn_uid in em.escher_graph['reactions']:
+            rxn_node = em.escher_graph['reactions'][rxn_uid]
+            map_rxn_set.add(rxn_node['bigg_id'])
+        return map_rxn_set & model_rxns
+    
+    def merge_models(self, models, model_id):
+        m = {
+                'id' : model_id,
+                'compartments' : {},
+                'metabolites' : [],
+                'reactions' : [],
+                'genes' : []
+            }
+        for model in models:
+            m['metabolites'] += model['metabolites']
+            m['reactions'] += model['reactions']
+            m['genes'] += model['genes']
+        return m
+    
+    def get_grid_model(self, rxn_ids, suffix, fbamodel, model_id):
+        m = {
+            'id' : model_id,
+            'compartments' : {},
+            'metabolites' : [],
+            'reactions' : [],
+            'genes' : []
+        }
+        gene_ids = {}
+        rxn_cpd_ids = set()
+        for rxn_id in rxn_ids:
+            rxn = fbamodel.get_reaction(rxn_id)
+            gpr = rxn.get_gpr()
+            #add suffix to GPR
+            gpr = list(map(lambda x : set(map(lambda i : "{}@{}".format(i, suffix), x)), gpr))
+            for and_rule in gpr:
+                for gene_id in and_rule:
+                    gene_ids[gene_id] = None
+            gpr_str = rxn.get_gpr_string(gpr)
+            print(rxn_id, gpr)
+            s = rxn.stoichiometry
+            metabolites = dict(map(lambda x : (x[0] + '@' + suffix, x[1]), s.items()))
+            for cpd_id in s:
+                rxn_cpd_ids.add(cpd_id)
+            m['reactions'].append({
+                'id': "{}@{}".format(rxn_id, suffix),
+                 'name': '{} [{}]'.format(rxn_id, suffix),
+                 'metabolites': metabolites,
+                 'lower_bound': rxn.bounds[0],
+                 'upper_bound': rxn.bounds[1],
+                 'gene_reaction_rule': gpr_str,
+                 'annotation': {}
+            })
+        for cpd_id in rxn_cpd_ids:
+            cpd = fbamodel.get_metabolite('cpd00002_c0')
+
+            m['metabolites'].append({
+                'id': "{}@{}".format(cpd_id, suffix),
+                'name': cpd.name,
+                'compartment': cpd.compartment,
+                'charge': 1,
+                'formula': 'C12H14N2O2',
+                'annotation': {}})
+
+        for gene_id in gene_ids:
+            m['genes'].append({
+                'id': "{}@{}".format(gene_id, suffix), 'name': "whollool", 'annotation': {}
+            })
+
+        return m

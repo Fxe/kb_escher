@@ -47,6 +47,22 @@
         "max_int": 10
       }
     },
+
+{
+      "id": "gene_mode",
+      "optional": false,
+      "advanced": false,
+      "allow_multiple": false,
+      "default_values": [
+        0
+      ],
+      "field_type": "checkbox",
+      "checkbox_options": {
+        "checked_value": true,
+        "unchecked_value": false,
+      }
+    },
+
 {
       "id": "report_height",
       "optional": false,
@@ -564,6 +580,9 @@
                 },{
                     "input_parameter": "report_height",
                     "target_property": "report_height"
+                },{
+                    "input_parameter": "gene_mode",
+                    "target_property": "gene_mode"
                 }
             ],
             "output_mapping": [
