@@ -42,16 +42,20 @@ parameters :
         long-hint  : Custom Map in the narrative workspace.
     model_id :
         ui-name : Metabolic Model
-        short-hint : kbase_compartment_id_hint
-        long-hint  : kbase_compartment_id_lhint
+        short-hint : Metabolic Model
+        long-hint  : Metabolic Model
     model_compartment_id :
         ui-name : Metabolic Model Compartment
-        short-hint : kbase_compartment_id_hint
-        long-hint  : kbase_compartment_id_lhint
+        short-hint : Compartment of the model to be represented in the cell
+        long-hint  : Compartment of the model to be represented in the cell
     model_alias :
         ui-name : Metabolic Model Alias
-        short-hint : kbase_compartment_id_hint
-        long-hint  : kbase_compartment_id_lhint
+        short-hint : Custom defined alias
+        long-hint  : All cells must have an unique identifier, e.g., cpd00001 @ <unique id>
+    export_full_model :
+        ui-name : Export All Model Data
+        short-hint : Allow maps to add additional reactions
+        long-hint  : By default each cell is limited to reactions within the pathway. This feature includes all data in the model (increases the report size).
     object_ids :
         ui-name : Flux Analysis Data
         short-hint : model_compartment_id_hint

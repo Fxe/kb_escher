@@ -18,6 +18,7 @@
           "model_id",
           "model_compartment_id",
           "model_alias",
+          "export_full_model",
           "object_ids",
           "cpd_abundance",
           "cpd_abundance_dataset",
@@ -52,6 +53,21 @@
       "id": "gene_mode",
       "optional": false,
       "advanced": false,
+      "allow_multiple": false,
+      "default_values": [
+        0
+      ],
+      "field_type": "checkbox",
+      "checkbox_options": {
+        "checked_value": true,
+        "unchecked_value": false
+      }
+    },
+        
+{
+      "id": "export_full_model",
+      "optional": false,
+      "advanced": true,
       "allow_multiple": false,
       "default_values": [
         0

@@ -5,7 +5,8 @@ import math
 from cobrakbase.core import KBaseFBAModel
 from cobrakbase.core.converters import KBaseFBAModelToCobraBuilder
 from modelseed_escher.core import EscherMap
-from modelseed_escher.convert_utils import move_to_compartment
+from modelseed_escher.convert_utils import move_to_compartment 
+from modelseed_escher.convert_utils import move_to_compartment2 #improved version to add '0' index
 
 def is_empty(s):
     if s == None:
@@ -160,8 +161,9 @@ class KBaseEscher:
                     self.object_cache[grid_cell['gene_expression']] = self.get_object_from_ref(grid_cell['gene_expression'])
                     
                 gene_data = (grid_cell['gene_expression'], grid_cell['gene_expression_dataset'])
-            
-            
+            export_full_model = False
+            if 'export_full_model' in grid_cell and grid_cell['export_full_model']:
+                export_full_model = True
             self.em_data.append({
                 'map_id' : map_id,
                 'model_id' : grid_cell['model_id'],
@@ -169,7 +171,8 @@ class KBaseEscher:
                 'alias' : alias,
                 'rxn_data' : rxn_data,
                 'cpd_data' : cpd_data,
-                'gene_data' : gene_data
+                'gene_data' : gene_data,
+                'export_full_model' : export_full_model
             })
         
     def build(self):
@@ -179,6 +182,7 @@ class KBaseEscher:
         self.global_gene_data = {}
         
         for grid_cell in self.em_data:
+            print(grid_cell)
             escher_map = self.base_maps[grid_cell['map_id']]
             fbamodel = self.model_cache[grid_cell['model_id']]
             cmp_id = grid_cell['cmp']
@@ -186,7 +190,8 @@ class KBaseEscher:
             em_cell = self.build_grid_cell(escher_map, fbamodel, 
                                                 cmp_id = cmp_id, alias = alias)
             
-            rxn_ids = self.get_rxn_in_model(fbamodel, grid_cell['map_id'], cmp_id)
+
+            rxn_ids = self.get_rxn_in_model(fbamodel, em_cell, cmp_id, alias, grid_cell['export_full_model'])
             em_model = self.get_grid_model(rxn_ids, alias, fbamodel, alias)
             self.em_list.append(em_cell)
             self.grid_models.append(em_model)
@@ -198,10 +203,14 @@ class KBaseEscher:
                     for o in fba.data['FBAReactionVariables']:
                         rxn_id = o['modelreaction_ref'].split('/')[-1]
                         flux_dist[rxn_id + '@' + grid_cell['alias']] = o['value']
-                    map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
-                    f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
-                    for k in f_dict:
-                        self.global_rxn_data[k] = f_dict[k]
+                    if grid_cell['export_full_model']:
+                        for k in flux_dist:
+                            self.global_rxn_data[k] = flux_dist[k]
+                    else:
+                        map_rxn_ids = set(map(lambda x : x[1]['bigg_id'], em_cell.escher_graph['reactions'].items()))
+                        f_dict = dict(filter(lambda x : x[0] in map_rxn_ids, flux_dist.items()))
+                        for k in f_dict:
+                            self.global_rxn_data[k] = f_dict[k]
             except Exception as e:
                 self.warnings.append("failed to add rxn_data")
                 
@@ -283,7 +292,7 @@ class KBaseEscher:
     def adapt_map_to_model(self, em, cmp_id, suffix, fbamodel):
         em = em.clone()
         #adapt map to compartment
-        move_to_compartment(cmp_id, em)
+        move_to_compartment2(cmp_id, em, '0')
 
         map_cpd_set = set()
         map_rxn_set = set()
@@ -314,15 +323,19 @@ class KBaseEscher:
 
         return em
     
-    def get_rxn_in_model(self, fbamodel, map_id, cmp_id):
+    def get_rxn_in_model(kb_escher, fbamodel, em, cmp_id, alias, all_rxn = False):
         map_rxn_set = set()
+        map_to_original = {}
         model_rxns = set(map(lambda x : x.id, fbamodel.reactions))
-        em = escher_map = self.base_maps[map_id].clone()
-        move_to_compartment(cmp_id, em)
+        model_rxns_alias = set(map(lambda x : x.id + '@' + alias, fbamodel.reactions))
+        for k in model_rxns:
+            map_to_original[k + '@' + alias] = k
+        if all_rxn:
+            return model_rxns
         for rxn_uid in em.escher_graph['reactions']:
             rxn_node = em.escher_graph['reactions'][rxn_uid]
             map_rxn_set.add(rxn_node['bigg_id'])
-        return map_rxn_set & model_rxns
+        return set(map(lambda x : map_to_original[x], map_rxn_set & model_rxns_alias))
     
     def merge_models(self, models, model_id):
         m = {
