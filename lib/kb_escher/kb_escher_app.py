@@ -73,10 +73,16 @@ class KBaseEscher:
             k = data['data']['row_ids'][i]
             v = data['data']['values'][i][col_index]
             if not v == None:
-                if k in mapping['instances'] and len(mapping['instances'][k]) > 5 and len(mapping['instances'][k][5]) > 0:
-                    result[mapping['instances'][k][5]] = v
-                else:
-                    result[k] = v
+                result[k] = v
+                if k in mapping['instances']:
+                    for attr_val in mapping['instances'][k]:
+                        if attr_val.startswith('cpd'):
+                            for maybe_seed_id in attr_val.split(';'):
+                                result[maybe_seed_id] = v
+                #if k in mapping['instances'] and len(mapping['instances'][k]) > 5 and len(mapping['instances'][k][5]) > 0:
+                #    result[mapping['instances'][k][5]] = v
+                #else:
+                #    result[k] = v
 
         return result
     
