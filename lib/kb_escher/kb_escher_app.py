@@ -147,10 +147,11 @@ class KBaseEscher:
             
             grid_cell_num +=1
             
-            if not is_empty(grid_cell['object_ids']) and not grid_cell['object_ids'][0] in self.object_cache:
+            if not is_empty(grid_cell['object_ids']):
                 fba_ref = grid_cell['object_ids'][0]
-                self.object_cache[fba_ref] = self.get_object_from_ref(fba_ref)
-            rxn_data = fba_ref
+                if not grid_cell['object_ids'][0] in self.object_cache:
+                    self.object_cache[fba_ref] = self.get_object_from_ref(fba_ref)
+                rxn_data = fba_ref
             
             if not is_empty(grid_cell['cpd_abundance']) and not is_empty(grid_cell['cpd_abundance_dataset']):
                 cpd_abundance_ref = grid_cell['cpd_abundance'][0]
