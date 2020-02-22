@@ -125,7 +125,7 @@
       "id": "object_ids",
       "optional": true,
       "advanced": false,
-      "allow_multiple": false,
+      "allow_multiple": true,
       "default_values": [
         ""
       ],
@@ -140,7 +140,7 @@
       "id": "cpd_abundance",
       "optional": true,
       "advanced": false,
-      "allow_multiple": false,
+      "allow_multiple": true,
       "default_values": [
         "null"
       ],
@@ -155,7 +155,7 @@
       "id": "gene_expression",
       "optional": true,
       "advanced": false,
-      "allow_multiple": false,
+      "allow_multiple": true,
       "default_values": [
         "null"
       ],

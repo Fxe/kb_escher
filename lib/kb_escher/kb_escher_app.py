@@ -11,6 +11,8 @@ from modelseed_escher.convert_utils import move_to_compartment2 #improved versio
 def is_empty(s):
     if s == None:
         return True
+    if type(s) == list:
+        return len(s) < 1
     if len(s.strip()) == 0:
         return True
     return False
@@ -122,10 +124,11 @@ class KBaseEscher:
                     self.base_maps[map_id] = em
                     
             else:
-                ref = self.kbase_api.get_object_info_from_ref(grid_cell['user_map_id'])
+                user_map_ref = grid_cell['user_map_id'][0]
+                ref = self.kbase_api.get_object_info_from_ref(user_map_ref)
                 map_id = 'custom.' + ref.id
                 if not map_id in self.base_maps:
-                    map_data = self.get_object_from_ref(grid_cell['user_map_id'])
+                    map_data = self.get_object_from_ref(user_map_ref)
                     em = modelseed_escher.core.EscherMap([map_data['metadata'], 
                                                           map_data['layout']])
                     self.base_maps[map_id] = em
@@ -144,23 +147,26 @@ class KBaseEscher:
             
             grid_cell_num +=1
             
-            if not is_empty(grid_cell['object_ids']) and not grid_cell['object_ids'] in self.object_cache:
-                self.object_cache[grid_cell['object_ids']] = self.get_object_from_ref(grid_cell['object_ids'])
-            rxn_data = grid_cell['object_ids']
+            if not is_empty(grid_cell['object_ids']) and not grid_cell['object_ids'][0] in self.object_cache:
+                fba_ref = grid_cell['object_ids'][0]
+                self.object_cache[fba_ref] = self.get_object_from_ref(fba_ref)
+            rxn_data = fba_ref
             
             if not is_empty(grid_cell['cpd_abundance']) and not is_empty(grid_cell['cpd_abundance_dataset']):
-                if not grid_cell['cpd_abundance'] in self.object_cache:
-                    self.object_cache[grid_cell['cpd_abundance']] = self.get_object_from_ref(grid_cell['cpd_abundance'])
-                row_attributemapping_ref = self.object_cache[grid_cell['cpd_abundance']]['row_attributemapping_ref']
+                cpd_abundance_ref = grid_cell['cpd_abundance'][0]
+                if not cpd_abundance_ref in self.object_cache:
+                    self.object_cache[cpd_abundance_ref] = self.get_object_from_ref(cpd_abundance_ref)
+                row_attributemapping_ref = self.object_cache[cpd_abundance_ref]['row_attributemapping_ref']
                 if not row_attributemapping_ref in self.object_cache:
                     self.object_cache[row_attributemapping_ref] = self.get_object_from_ref(row_attributemapping_ref)
-                cpd_data = (grid_cell['cpd_abundance'], grid_cell['cpd_abundance_dataset'])
+                cpd_data = (cpd_abundance_ref, grid_cell['cpd_abundance_dataset'])
                 
             if not is_empty(grid_cell['gene_expression']) and not is_empty(grid_cell['gene_expression_dataset']):
-                if not grid_cell['gene_expression'] in self.object_cache:
-                    self.object_cache[grid_cell['gene_expression']] = self.get_object_from_ref(grid_cell['gene_expression'])
+                gene_expr_ref = grid_cell['gene_expression'][0]
+                if not gene_expr_ref in self.object_cache:
+                    self.object_cache[gene_expr_ref] = self.get_object_from_ref(gene_expr_ref)
                     
-                gene_data = (grid_cell['gene_expression'], grid_cell['gene_expression_dataset'])
+                gene_data = (gene_expr_ref, grid_cell['gene_expression_dataset'])
             export_full_model = False
             if 'export_full_model' in grid_cell and grid_cell['export_full_model']:
                 export_full_model = True
