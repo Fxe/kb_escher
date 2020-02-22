@@ -55,7 +55,7 @@
 <div class="container-fluid fill_height">
   <div id="top_bar">
     <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Setup Pathway Viewer</button> -->
-    Mode: <button id="toggle_gene" class="btn btn-seed-sm btn-dark"><i class="fas fa-dna"></i> Gene</button>
+    Mode: <button id="toggle_gene" class="btn btn-seed-sm btn-dark"><i class="fas fa-dna"></i> Gene Expression</button>
   </div>
   <div>
     <div id="escher_controls" class="float-left"></div>
@@ -146,7 +146,7 @@
 
   function refresh_toggle(o) {
     if (viewer_config['gene_mode']) {
-      $('#toggle_gene').html('<i class="fas fa-dna"></i> Gene');
+      $('#toggle_gene').html('<i class="fas fa-dna"></i> Gene Expression');
       update_gene_data();
     } else {
       $('#toggle_gene').html('<i class="fas fa-wave-square"></i> Flux');
