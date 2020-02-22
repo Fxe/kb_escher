@@ -385,7 +385,7 @@ class KBaseEscher:
                  'annotation': {}
             })
         for cpd_id in rxn_cpd_ids:
-            cpd = fbamodel.get_metabolite('cpd00002_c0')
+            cpd = fbamodel.get_metabolite(cpd_id)
 
             m['metabolites'].append({
                 'id': "{}@{}".format(cpd_id, suffix),
