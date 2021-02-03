@@ -13,6 +13,7 @@ MAINTAINER KBase Developer
 
 RUN pip install --upgrade pip
 
+RUN rm -rf /miniconda/lib/python3.6/site-packages/ruamel*
 RUN pip install cobra==0.17.1
 RUN pip install cobrakbase==0.2.3
 RUN pip install networkx
