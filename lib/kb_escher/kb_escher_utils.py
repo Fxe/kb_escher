@@ -101,12 +101,12 @@ def get_all_expression_data(data):
 def scan_content(escher_map, fbamodel, fba):
     map_cpd_set = set()
     map_rxn_set = set()
-    for node_uid in map_data.nodes:
-        node = map_data.escher_graph['nodes'][node_uid]
+    for node_uid in escher_map.nodes:
+        node = escher_map.escher_graph['nodes'][node_uid]
         if node['node_type'] == 'metabolite':
             map_cpd_set.add(node['bigg_id'])
-    for rxn_uid in map_data.escher_graph['reactions']:
-        rxn_node = map_data.escher_graph['reactions'][rxn_uid]
+    for rxn_uid in escher_map.escher_graph['reactions']:
+        rxn_node = escher_map.escher_graph['reactions'][rxn_uid]
         map_rxn_set.add(rxn_node['bigg_id'])
     
     cpd_in_map_count = len(map_cpd_set & set(map(lambda x : x.get_seed_id(), fbamodel.metabolites)))

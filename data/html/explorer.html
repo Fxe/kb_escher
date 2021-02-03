@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KBase Escher Viewer</title>
+
+  <link rel="stylesheet" href="css/bootstrap.css" />
+  <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" />
+  <link rel="stylesheet" href="css/scroller.bootstrap4.min.css" />
+  <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css" />
+  <link rel="stylesheet" href="css/fontawesome.min.css" />
+  <link rel="stylesheet" href="css/solid.min.css" />
+  <link rel="stylesheet" href="css/regular.min.css" />
+  <link rel="stylesheet" href="css/select2.min.css" />
+  <link rel="stylesheet" href="css/builder.css" />
+  <link rel="stylesheet" href="css/builder-bootstrap.css" />
+  <link rel="stylesheet" href="css/escher-shadow.css" />
+  <link rel="stylesheet" href="css/seed.css" />
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+
+    table.dataTable tbody tr.selected {
+      background-color: #B0BED9;
+    }
+
+    .fill_height {
+      display: flex;
+      flex-flow: column;
+      height: 100%;
+    }
+
+    li.select2-selection__choice {
+      max-width: 100%;
+      overflow: hidden;
+      /*Altered two below to make word wrap work */
+      word-wrap: normal !important;
+      white-space: normal;
+    }
+    ul.select2-selection__rendered {
+      padding-right: 12px !important;
+    }
+    #map_container{
+      /* background-color: black; */
+      flex-grow : 1;
+      height: 100%;
+      /* height: 800px; */
+    }
+  </style>
+<body>
+<div class="container-fluid fill_height">
+  <div id="top_bar">
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal_builder">Setup Pathway Viewer</button>
+    Mode: <button id="toggle_gene" class="btn btn-seed-sm btn-dark"><i class="fas fa-dna"></i> Gene</button>
+  </div>
+  <div>
+    <div id="escher_controls" class="float-left"></div>
+    <div id="select_biochem" class="float-left"></div>
+  </div>
+
+
+  <div id="map_container"></div>
+
+  <div class="modal fade" id="modal_builder" tabindex="-1" role="dialog" aria-labelledby="modal_builder_label" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 1500px">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal_builder_label">Build Configuration</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+  <div class="row">
+    <div class="col-md-6">
+      <table id="table_map_select" class="table table-striped">
+        <thead class="thead-light">
+        <tr>
+          <th scope="col">Map</th>
+          <th scope="col">Compounds</th>
+          <th scope="col">Reactions</th>
+        </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <div id="controls"></div>
+    </div>
+  </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <div class="form-row">
+                <div class="form-group col-md-12" style="width: 100%">
+                  <label for="select_target_map">Target Map Layout</label>
+                  <div class="select2-seed"><div id="select_target_map"></div></div>
+
+                </div>
+              </div>
+              <label for="select_target_cmp">Target Standard Compartment</label>
+              <div id="select_target_cmp"></div>
+
+              <label for="select_model">SBML Model</label>
+              <div id="select_model"></div>
+
+              <label for="select_model_cmp">SBML Compartment</label>
+              <div id="select_model_cmp"></div>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="select_build_list">Build Selection:</label>
+              <select id="select_build_list" class="form-control" size="4" multiple="multiple" style="width:100%;height : 200px">
+              </select>
+
+              <label >Grid</label>
+              <label for="input_grid_x">X:</label>
+              <input id="input_grid_x" class="form-control" type="number" min="0" max="10" value="3">
+              <label for="input_grid_y">Y:</label>
+              <input id="input_grid_y" class="form-control" type="number" min="0" max="10" value="2">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <button id="button_add_map_option" class="btn btn-primary">Add</button>
+            </div>
+            <div class="form-group col-md-6">
+              <button id="button_remove_select" class="btn btn-primary">Remove</button>
+
+              <button id="button_build_map" class="btn btn-primary">Build</button>
+
+              <button id="button_merge_map" class="btn btn-success">Merge</button>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+<script src="js/d3-3.5.6.min.js"></script>
+<script src="js/escher.js"></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/underscore-1.9.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+<script src="js/dataTables.bootstrap4.min.js"></script>
+<script src="js/curation_api.js"></script>
+<script src="js/curation_env.js"></script>
+<script src="js/widget_escher_modelseed.js"></script>
+<script src="js/escher_map.js"></script>
+<script src="js/escher_shadow.js"></script>
+<script>
+  //
+
+  let current_flux_data = {};
+  let current_metabolite_data = {};
+  let current_gene_data = {};
+  let models = ['iML1515', 'KBase'];
+
+
+
+  const clear_flux_model = function(model_id) {
+    console.log('CLEAR (REACTION)', model_id)
+    _.each(_.keys(current_flux_data), function(k) {
+      let data = k.split('@');
+      //console.log(data);
+      if (data[data.length - 1] === model_id) {
+        current_flux_data[k] = 0.0;
+        //console.log(k, current_flux_data[k])
+      }
+    });
+  };
+  const clear_gene_model = function(model_id) {
+    _.each(_.keys(current_gene_data), function(k) {
+      current_gene_data[k] = 0.0;
+      /*
+      let data = k.split('@');
+      if (data[data.length - 1] === model_id) {
+        current_gene_data[k] = 0.0;
+      }*/
+    });
+  };
+
+  const clear_metabolite_model = function(model_id) {
+    _.each(_.keys(current_metabolite_data), function(k) {
+      let data = k.split('@');
+      if (data[data.length - 1] === model_id) {
+        current_metabolite_data[k] = 0.0;
+      }
+    });
+  };
+
+  const update_flux_data = function() {
+    if (e_builder) {
+      e_builder.set_gene_data(null);
+      e_builder.set_reaction_data(current_flux_data);
+    }
+    //e_builder.map.apply_reaction_data_to_map(current_flux_data);
+    //e_builder.map.draw_everything();
+  };
+
+  const update_gene_data = function() {
+    if (e_builder) {
+      e_builder.set_reaction_data(null);
+      e_builder.set_gene_data(current_gene_data);
+    }
+
+    //e_builder.map.apply_reaction_data_to_map(current_flux_data);
+    //e_builder.map.draw_everything();
+  };
+
+  const update_metabolite_data = function() {
+    e_builder.set_metabolite_data(current_metabolite_data);
+  };
+
+  function refresh_toggle(o) {
+    if (viewer_config['gene_mode']) {
+      $('#toggle_gene').html('<i class="fas fa-dna"></i> Gene');
+      update_gene_data();
+    } else {
+      $('#toggle_gene').html('<i class="fas fa-wave-square"></i> Flux');
+      update_flux_data();
+    }
+  }
+
+  $('#toggle_gene').click(function(e) {
+    if (viewer_config['gene_mode']) {
+      viewer_config['gene_mode'] = false
+    } else {
+      viewer_config['gene_mode'] = true
+    }
+    refresh_toggle($('#toggle_gene'))
+  });
+  //const api = new CurationAPI();
+$.getJSON("data/map_decorators.json", function(o) {
+    console.log(o);
+    let container = $('#controls');
+    //<input type="radio" name="iML1515_FBA" value="none"> None<br>
+    _.each(o, function(decorators, model_id) {
+        console.log(model_id, decorators);
+        container.append(model_id);
+        container.append('<br>');
+        _.each(decorators, function(d_type_objects, d_supertype) {
+          container.append(d_supertype);
+          container.append('<br>');
+          _.each(d_type_objects, function(d_objects, d_type) {
+              let clear_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : 'none'});
+            if (d_supertype === 'compound') {
+              clear_input.click(function() {
+                clear_metabolite_model(model_id);
+                update_metabolite_data();
+              });
+              container.append(clear_input);
+              container.append('None <br>');
+            } else if (d_supertype === 'reaction') {
+              clear_input.click(function() {
+                clear_flux_model(model_id);
+                update_flux_data();
+              });
+              container.append(clear_input);
+              container.append('None <br>');
+            } else if (d_supertype === 'gene') {
+              clear_input.click(function() {
+                clear_gene_model(model_id);
+                update_gene_data();
+              });
+              container.append(clear_input);
+              container.append('None <br>');
+            }
+
+
+              _.each(d_objects, function(d_object) {
+
+                if (d_supertype === 'compound') {
+                  let change_flux_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : d_object.path});
+                  change_flux_input.click(function() {
+                    $.getJSON("data/datasets/" + d_object.path, function(o) {
+                      console.log('change_flux_input (METABOLITE)', o);
+                      _.each(o, function(v, k) {
+                        current_metabolite_data[k + '_c0@' + model_id] = [v];
+                      });
+                      //_.extend(current_flux_data, o);
+                      update_metabolite_data();
+                    });
+                    //alert('clear ' + d_object.path);
+
+                  });
+                  container.append(change_flux_input);
+                  container.append(d_object.id + ' <br>')
+                } else if (d_supertype === 'reaction') {
+                  let change_flux_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : d_object.path});
+                  change_flux_input.click(function() {
+                    $.getJSON("data/datasets/" + d_object.path, function(o) {
+                      console.log('change_flux_input (REACTION)', o);
+                      _.each(o, function(v, k) {
+                        current_flux_data[k + '@' + model_id] = [v];
+                      });
+                      //_.extend(current_flux_data, o);
+                      update_flux_data();
+                    });
+                    //alert('clear ' + d_object.path);
+
+                  });
+                  container.append(change_flux_input);
+                  container.append(d_object.id + ' <br>')
+                } else if (d_supertype === 'gene') {
+                  let change_flux_input = $('<input>', {type : 'radio', name : model_id + d_supertype, value : d_object.path});
+                  change_flux_input.click(function() {
+                    $.getJSON("data/datasets/" + d_object.path, function(o) {
+                      console.log('change_flux_input (GENE)', o, d_object.path);
+                      _.each(o, function(v, k) {
+                        //current_gene_data[k + '@' + model_id] = [v];
+                        current_gene_data[k] = v;
+                      });
+                      update_gene_data();
+                    });
+                  });
+                  container.append(change_flux_input);
+                  container.append(d_object.id + ' <br>')
+                }
+
+              })
+          })
+        });
+
+    })
+});
+    
+  $.getJSON("data/map_list.json", function(e) {
+    //console.log(e);
+    let table = $("#table_map_select").DataTable({
+      select: {
+        style: 'single'
+      }
+    });
+    let rows = [];
+    _.each(e, function (map_data, map_id) {
+      let total_cpd_in_map = 0;
+      let total_rxn_in_map = 0;
+      let in_map_cpd = [];
+      let in_map_rxn = [];
+      _.each(map_data, function (stats, model_id) {
+        total_cpd_in_map = stats['map_cpd'];
+        total_rxn_in_map = stats['map_rxn'];
+        in_map_cpd.push(stats['cpd_in_map_count']);
+        in_map_rxn.push(stats['rxn_in_map_count']);
+      });
+      let row_data = [
+        map_id,
+        total_cpd_in_map + ' (' + in_map_cpd + ')',
+        total_rxn_in_map + ' (' + in_map_rxn + ')'
+      ];
+      rows.push(row_data)
+    });
+    table.rows.add(rows).draw();
+  });
+
+  let viewer_config = {};
+
+  let omg = null;
+  let current_map = null;
+  let e_builder = null;
+  $.getJSON("data/viewer_config.json", function(config) {
+    viewer_config = config;
+    refresh_toggle($('#toggle_gene'))
+    let build_config = config['grid_config'];
+    $.getJSON("data/models/model.json", function(e_model) {
+      $.getJSON("data/escher_map.json", function(e_map) {
+        current_map = e_map;
+        let e_options = {
+          menu: 'all', //config['menu'],
+          fill_screen: false
+          //tooltip_component: tooltip,
+        };
+        //let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
+        e_builder = escher.Builder(e_map, e_model, null, d3.select('#map_container'), e_options);
+        e_builder.map.convert_map();
+        e_builder.settings.set_option('show_gene_reaction_rules', true);
+        e_builder.map.draw_everything();
+        let shadow_grid_layout = get_shadow_grid_layout(e_map[1].canvas, build_config);
+        console.log('Grid Layout', shadow_grid_layout);
+
+        draw_show_grid_layout2(shadow_grid_layout, $);
+
+        if (viewer_config['default_rxn_data']) {
+          $.getJSON("data/" + viewer_config['default_rxn_data'], function(d) {
+            current_flux_data = d;
+            update_flux_data();
+
+          });
+        }
+        if (viewer_config['default_cpd_data']) {
+          $.getJSON("data/" + viewer_config['default_cpd_data'], function(d) {
+            current_metabolite_data = d;
+            update_metabolite_data();
+
+          });
+        }
+
+        if (viewer_config['default_gene_data']) {
+          $.getJSON("data/" + viewer_config['default_gene_data'], function(d) {
+
+            current_gene_data = d;
+            if (viewer_config['gene_mode']) {
+
+              refresh_toggle($('#toggle_gene'))
+            }
+          });
+        }
+
+        let env = new CurationEnvironment(null, [
+          new WidgetEscherModelseed($('#top_bar'), e_builder, false, true)
+        ]);
+        env.init_ui();
+      });
+    });
+  });
+
+
+  /*
+
+    _.each(catalog, function(map_list, dataset_id) {
+    _.each(map_list, function(map_id) {
+      //button_html = $('a', {'href' : '#'}).html('<span class="oi oi-eye"></span>')
+      button_html = '<a href="#" onclick="load_escher_map(\'' + dataset_id +'\', \'' + map_id + '\');"><span class="oi oi-eye"></span></a>'
+
+      let map_str = map_id
+      if (map_id.indexOf(dataset_id) == 0) {
+        map_str = map_id.substring(dataset_id.length + 1)
+      }
+      row_data = [
+        dataset_id,
+        map_str,
+        '-',
+        '-',
+        button_html
+      ];
+      rows.push(row_data)
+    });
+  });
+
+    for (map_id in e_catalog) {
+      map_data = e_catalog[map_id]
+      button_html = '<a href="#" onclick="load_escher_map(\'' + map_data["src"] +'\');"><span class="oi oi-eye"></span></a>'
+      row_data = [
+        map_id,
+        '-',
+        '-',
+        '-',
+        button_html
+      ];
+      //rows.push(row_data)
+    }*/
+
+
+</script>
+</html>
+

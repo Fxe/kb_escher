@@ -19,6 +19,7 @@
           "model_compartment_id",
           "model_alias",
           "export_full_model",
+          "translate_map",
           "object_ids",
           "cpd_abundance",
           "cpd_abundance_dataset",
@@ -78,7 +79,20 @@
         "unchecked_value": false
       }
     },
-
+{
+      "id": "translate_map",
+      "optional": false,
+      "advanced": true,
+      "allow_multiple": false,
+      "default_values": [
+        1
+      ],
+      "field_type": "checkbox",
+      "checkbox_options": {
+        "checked_value": true,
+        "unchecked_value": false
+      }
+    },
 {
       "id": "report_height",
       "optional": false,

@@ -175,13 +175,17 @@ class KBaseEscher:
                     
                 gene_data = (gene_expr_ref, grid_cell['gene_expression_dataset'])
             export_full_model = False
+            translate_map = False
             if 'export_full_model' in grid_cell and grid_cell['export_full_model']:
                 export_full_model = True
+            if 'translate_map' in grid_cell and grid_cell['translate_map']:
+                translate_map = True
             self.em_data.append({
                 'map_id' : map_id,
                 'model_id' : grid_cell['model_id'],
                 'cmp' : 'c0',
                 'alias' : alias,
+                'adapt' : translate_map,
                 'rxn_data' : rxn_data,
                 'cpd_data' : cpd_data,
                 'gene_data' : gene_data,
@@ -200,8 +204,9 @@ class KBaseEscher:
             fbamodel = self.model_cache[grid_cell['model_id']]
             cmp_id = grid_cell['cmp']
             alias = grid_cell['alias']
+            adapt = grid_cell['adapt']
             em_cell = self.build_grid_cell(escher_map, fbamodel, 
-                                                cmp_id = cmp_id, alias = alias)
+                                                cmp_id = cmp_id, alias = alias, adapt = adapt)
             
 
             rxn_ids = self.get_rxn_in_model(fbamodel, em_cell, cmp_id, alias, grid_cell['export_full_model'])
@@ -298,15 +303,69 @@ class KBaseEscher:
             with open(folder + '/escher_map.json', 'w') as fh:
                 fh.write(json.dumps(self.grid_map.escher_map))
     
-    def build_grid_cell(self, escher_map, fbamodel, cmp_id = 'c0', alias = None):
-        em = self.adapt_map_to_model(escher_map, cmp_id, str(alias), fbamodel)
+    def build_grid_cell(self, escher_map, fbamodel, cmp_id = 'c0', alias = None, adapt = True):
+        em = self.adapt_map_to_model(escher_map, cmp_id, str(alias), fbamodel, adapt)
         return em
     
-    def adapt_map_to_model(self, em, cmp_id, suffix, fbamodel):
+    def detect_current_compartment(self, n):
+        id = n['bigg_id']
+        if 'compartment' in n:
+            return id, n['compartment']
+        if '_' in id:
+            p = id.split('_')
+            base = '_'.join(p[:-1])
+            return base, p[-1]
+        return None, None
+    
+    def move_to_compartment22(self, cmp_id, em, cmp_index):
+        em.add_uid_to_reaction_metabolites()
+        node_uid_cmp = {}
+        node_uid_id = {}
+        for node_uid in em.escher_graph['nodes']:
+            n = em.escher_graph['nodes'][node_uid]
+            if n['node_type'] == 'metabolite':
+                target_cmp = cmp_id
+                base, node_cmp = self.detect_current_compartment(n)
+                if not node_cmp == None:
+                    node_cmp_index = self.detect_compartment_index(node_cmp)
+                    if node_cmp_index == None:
+                        node_cmp += str(cmp_index)
+                    target_cmp = node_cmp
+                #print(n['bigg_id'], target_cmp)
+                if not 'compartment' in n:
+                    node_uid_cmp[node_uid] = target_cmp
+                    if not base == None:
+                        n['bigg_id'] = base + '_' + target_cmp
+                    else:
+                        n['bigg_id'] += '_' + target_cmp
+                    node_uid_id[node_uid] = n['bigg_id']
+        add_compartment(em, node_uid_cmp)
+        for rxn_uid in em.escher_graph['reactions']:
+            rnode = em.escher_graph['reactions'][rxn_uid]
+            target_cmp = cmp_id
+            base, node_cmp = self.detect_current_compartment(rnode)
+            if not node_cmp == None:
+                node_cmp_index = self.detect_compartment_index(node_cmp)
+                if node_cmp_index == None:
+                    node_cmp += str(cmp_index)
+                target_cmp = node_cmp
+            for o in rnode['metabolites']:
+                o['bigg_id'] = node_uid_id[o['node_uid']]
+
+            if not base == None:
+                rnode['bigg_id'] = base + '_' + target_cmp
+            else:
+                rnode['bigg_id'] += '_' + target_cmp
+        return node_uid_cmp
+    
+    def adapt_map_to_model(self, em, cmp_id, suffix, fbamodel, adapt=True):
+        print('adapt_map_to_model')
         em = em.clone()
         #adapt map to compartment
-        move_to_compartment2(cmp_id, em, '0')
-
+        print(cmp_id)
+        if adapt:
+            move_to_compartment2(cmp_id, em, '0')
+        print(cmp_id)
         map_cpd_set = set()
         map_rxn_set = set()
         for node_uid in em.nodes:

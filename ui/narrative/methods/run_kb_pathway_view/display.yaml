@@ -40,6 +40,10 @@ parameters :
         ui-name : Narrative Map
         short-hint : Custom Map
         long-hint  : Custom Map in the narrative workspace.
+    translate_map :
+        ui-name : Translate Generic Map
+        short-hint : Translate Generic Map to Model Data
+        long-hint  : Generic Map do not contain compartment data (e.g., c0, e0, m0, etc), uncheck this for custom maps with compartments.
     model_id :
         ui-name : Metabolic Model
         short-hint : Metabolic Model
