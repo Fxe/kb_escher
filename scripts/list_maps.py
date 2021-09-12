@@ -1,7 +1,7 @@
 import escher
-import modelseed_escher
+import modelseedpy_escher
 
-escher_seed = modelseed_escher.EscherManager(escher)
+escher_seed = modelseedpy_escher.EscherManager(escher)
 
 print(escher_seed.escher.get_cache_dir())
 

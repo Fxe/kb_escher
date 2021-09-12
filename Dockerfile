@@ -6,7 +6,8 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-# RUN apt-get update
+RUN apt-get update
+RUN apt-get install -y g++
 
 #RUN mkdir -p /opt/data
 #RUN git clone https://github.com/ModelSEED/ModelSEEDDatabase.git /opt/data/ModelSEEDDatabase
@@ -14,16 +15,17 @@ MAINTAINER KBase Developer
 RUN pip install --upgrade pip
 
 RUN rm -rf /miniconda/lib/python3.6/site-packages/ruamel*
-RUN pip install cobra==0.17.1
-RUN pip install cobrakbase==0.2.3
+RUN pip install cobra==0.19.0
 RUN pip install networkx
 
 RUN mkdir -p /opt/build
-RUN git clone https://github.com/ModelSEED/modelseed-escher.git /opt/build/modelseed-escher
+RUN git clone https://github.com/Fxe/cobrakbase.git /opt/build/cobrakbase
+RUN git clone https://github.com/ModelSEED/ModelSEEDpy.git /opt/build/ModelSEEDpy
+RUN git clone https://github.com/ModelSEED/ModelSEEDpy-Escher.git /opt/build/ModelSEEDpy-Escher
 
-
-
-RUN pip install /opt/build/modelseed-escher
+RUN pip install /opt/build/ModelSEEDpy
+RUN pip install /opt/build/cobrakbase
+RUN pip install /opt/build/ModelSEEDpy-Escher
 
 # -----------------------------------------
 RUN mkdir -p /kb/module/data/html/data/map_base

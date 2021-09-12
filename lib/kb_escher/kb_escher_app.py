@@ -1,12 +1,12 @@
 import cobrakbase
 import json
-import modelseed_escher
+import modelseedpy_escher
 import math
 from cobrakbase.core import KBaseFBAModel
 from cobrakbase.core.converters import KBaseFBAModelToCobraBuilder
-from modelseed_escher.core import EscherMap
-from modelseed_escher.convert_utils import move_to_compartment 
-from modelseed_escher.convert_utils import move_to_compartment2 #improved version to add '0' index
+from modelseedpy_escher.core import EscherMap
+from modelseedpy_escher.convert_utils import move_to_compartment 
+from modelseedpy_escher.convert_utils import move_to_compartment2 #improved version to add '0' index
 
 def is_empty(s):
     if s == None:
@@ -135,7 +135,7 @@ class KBaseEscher:
                 map_id = 'custom.' + ref.id
                 if not map_id in self.base_maps:
                     map_data = self.get_object_from_ref(user_map_ref)
-                    em = modelseed_escher.core.EscherMap([map_data['metadata'], 
+                    em = modelseedpy_escher.core.EscherMap([map_data['metadata'], 
                                                           map_data['layout']])
                     self.base_maps[map_id] = em
             
@@ -199,12 +199,13 @@ class KBaseEscher:
         self.global_gene_data = {}
         
         for grid_cell in self.em_data:
-            print(grid_cell)
+            print('grid_cell', grid_cell)
             escher_map = self.base_maps[grid_cell['map_id']]
             fbamodel = self.model_cache[grid_cell['model_id']]
             cmp_id = grid_cell['cmp']
             alias = grid_cell['alias']
             adapt = grid_cell['adapt']
+            #return escher_map
             em_cell = self.build_grid_cell(escher_map, fbamodel, 
                                                 cmp_id = cmp_id, alias = alias, adapt = adapt)
             
@@ -259,7 +260,7 @@ class KBaseEscher:
             except:
                 self.warnings.append("failed to add gene_data")
                 
-        grid = modelseed_escher.EscherGrid()
+        grid = modelseedpy_escher.EscherGrid()
         grid_map = grid.build(self.em_list, self.grid_size)
         self.grid_map = grid_map
         return self.grid_map
@@ -368,8 +369,7 @@ class KBaseEscher:
         print(cmp_id)
         map_cpd_set = set()
         map_rxn_set = set()
-        for node_uid in em.nodes:
-            node = em.escher_graph['nodes'][node_uid]
+        for node in em.nodes:
             if node['node_type'] == 'metabolite':
                 map_cpd_set.add(node['bigg_id'])
         for rxn_uid in em.escher_graph['reactions']:
