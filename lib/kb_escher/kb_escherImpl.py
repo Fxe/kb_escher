@@ -9,7 +9,7 @@ import shutil
 
 import escher
 import cobrakbase
-import modelseed_escher
+from modelseedpy_escher import EscherManager
 
 from kb_escher.utils import mkdir_p
 from kb_escher.kb_escher_app import KBaseEscher
@@ -130,7 +130,7 @@ class kb_escher:
         ws = params['workspace_name']
         print(params)
         api = cobrakbase.KBaseAPI(ctx['token'], config={'workspace-url' : self.ws_url})
-        escher_seed = modelseed_escher.EscherManager(escher)
+        escher_seed = EscherManager(escher)
         
         kb_escher = KBaseEscher(params, api, escher_seed)
         
