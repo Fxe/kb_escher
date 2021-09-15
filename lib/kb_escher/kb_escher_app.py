@@ -298,10 +298,10 @@ class KBaseEscher:
 
         for map_id in self.base_maps:
             with open(folder + '/map_base/' + map_id + '.json', 'w') as fh:
-                fh.write(json.dumps(self.base_maps[map_id].escher_map))
-        if not self.grid_map == None:
+                fh.write(json.dumps(self.base_maps[map_id].escher_data))
+        if self.grid_map is not None:
             with open(folder + '/escher_map.json', 'w') as fh:
-                fh.write(json.dumps(self.grid_map.escher_map))
+                fh.write(json.dumps(self.grid_map.escher_data))
     
     def build_grid_cell(self, escher_map, fbamodel, cmp_id = 'c0', alias = None, adapt = True):
         em = self.adapt_map_to_model(escher_map, cmp_id, str(alias), fbamodel, adapt)
