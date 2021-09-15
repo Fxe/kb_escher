@@ -20,8 +20,8 @@ RUN pip install networkx
 
 RUN mkdir -p /opt/build
 RUN git clone https://github.com/Fxe/cobrakbase.git /opt/build/cobrakbase
-RUN git clone https://github.com/ModelSEED/ModelSEEDpy.git /opt/build/ModelSEEDpy
 RUN git clone https://github.com/ModelSEED/ModelSEEDpy-Escher.git /opt/build/ModelSEEDpy-Escher
+RUN git clone https://github.com/ModelSEED/ModelSEEDpy.git /opt/build/ModelSEEDpy
 
 RUN pip install /opt/build/ModelSEEDpy
 RUN pip install /opt/build/cobrakbase

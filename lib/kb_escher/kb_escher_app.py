@@ -206,8 +206,7 @@ class KBaseEscher:
             alias = grid_cell['alias']
             adapt = grid_cell['adapt']
             #return escher_map
-            em_cell = self.build_grid_cell(escher_map, fbamodel, 
-                                                cmp_id = cmp_id, alias = alias, adapt = adapt)
+            em_cell = self.build_grid_cell(escher_map, fbamodel, cmp_id=cmp_id, alias=alias, adapt=adapt)
             
 
             rxn_ids = self.get_rxn_in_model(fbamodel, em_cell, cmp_id, alias, grid_cell['export_full_model'])
@@ -376,8 +375,8 @@ class KBaseEscher:
             rxn_node = em.escher_graph['reactions'][rxn_uid]
             map_rxn_set.add(rxn_node['bigg_id'])
 
-        model_cpds = set(map(lambda x : x.id, fbamodel.metabolites))
-        model_rxns = set(map(lambda x : x.id, fbamodel.reactions))
+        model_cpds = set(map(lambda x: x.id, fbamodel.metabolites))
+        model_rxns = set(map(lambda x: x.id, fbamodel.reactions))
 
         map_cpd_delete = map_cpd_set - model_cpds
         map_rxn_delete = map_rxn_set - model_rxns
