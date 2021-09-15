@@ -237,7 +237,7 @@ class KBaseEscher:
                 if grid_cell['cpd_data']:
                     cpd_mat = self.object_cache[grid_cell['cpd_data'][0]]
                     cpd_data = self.get_chemical_abundance_data(cpd_mat, grid_cell['cpd_data'][1])
-                    if cpd_data == None or len(cpd_data) == 0:
+                    if cpd_data is None or len(cpd_data) == 0:
                         self.warnings.append("Unable to map ModelSEED identifiers")
                     else:
                         cpd_data = dict(map(lambda x : (x[0] + '_' + cmp_id + '@' + alias, x[1]), cpd_data.items()))
